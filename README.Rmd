@@ -13,16 +13,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-# healthburdenR
+# healthburdenr
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of healthburdenR is to ...
+The goal of healthburdenr is to ...
 
 ## Installation
 
-You can install the development version of healthburdenR from [GitHub](https://github.com/) with:
+You can install the development version of healthburdenr from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("pak")
@@ -34,7 +34,7 @@ pak::pak("ETC5523-2025/assignment-4-packages-and-shiny-apps-jcha0338-monash")
 This is a basic example which shows you how to solve a common problem:
 
 ```{r example}
-library(healthburdenR)
+# library(healthburdenr)
 ## basic example code
 ```
 
