@@ -1,0 +1,75 @@
+/* Dashboard header and navbar styles */
+.skin-blue .main-header .logo {
+  background-color: #2C3E50;
+  font-weight: bold;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+
+.skin-blue .main-header .navbar {
+  background-color: #34495E;
+}
+
+/* Value box customizations */
+.small-box.bg-blue { background: #2980B9 !important; color: #fff !important; }
+.small-box.bg-red { background: #C0392B !important; color: #fff !important; }
+.small-box.bg-olive { background: #27AE60 !important; color: #fff !important; }
+
+/* Box styling */
+.box {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.box .box-header {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding-bottom: 10px;
+}
+
+/* Improved typography and controls */
+body, .content-wrapper, .content, .box {
+  font-family: 'Segoe UI', Arial, sans-serif !important;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.box-title {
+  font-weight: 600;
+  font-size: 18px;
+}
+
+/* Hover effects for value and info boxes */
+.value-box, .box {
+  transition: box-shadow 0.3s;
+}
+
+.value-box:hover, .box:hover {
+  box-shadow: 0 5px 15px rgba(44,62,80,0.1);
+}
+
+.selectize-input, .form-control, .radio label {
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.radio input[type="radio"]:checked + .radio-label {
+  color: #2980B9;
+}
+
+/* Plot container touch-ups */
+#treemap_plot {
+  background: #f8fcff;
+  border-radius: 8px;
+  padding-top: 12px;
+}
+
+ul {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+strong {
+  color: #2C3E50;
+}
