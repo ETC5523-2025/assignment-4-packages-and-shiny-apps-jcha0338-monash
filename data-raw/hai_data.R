@@ -85,12 +85,14 @@ bhai_strata_summary <- bhai_summary_df |>
 # German population estimates
 bhai_german_pop_est <- bhai.prettyTable(bhai_german_pps) |>
   as_tibble(rownames = "infection") |>
-  mutate(country = "Germany")
+  mutate(country = "Germany") |>
+  mutate(population = bhai_german_pps@population)
 
 # EU population estimates
 bhai_eu_pop_est <- bhai.prettyTable(bhai_eu_pps) |>
   as_tibble(rownames = "infection") |>
-  mutate(country = "European Union")
+  mutate(country = "European Union") |>
+  mutate(population = bhai_eu_pps@population)
 
 # Helper function to split confidence intervals from formatted strings
 split_ci <- function(x) {
