@@ -6,10 +6,12 @@ dashboardPage(
   skin = "blue",
 
   dashboardHeader(
-    title = "BHAI: Healthcare-Associated Infections Dashboard"
+    title = "BHAI: Healthcare-Associated Infections Dashboard",
+    titleWidth = 450
   ),
 
   dashboardSidebar(
+    width = 250,
     sidebarMenu(
       id = "tabs",
       menuItem("Overview", tabName = "overview", icon = icon("info-circle")),
@@ -22,71 +24,128 @@ dashboardPage(
     tags$head(
       tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
     ),
+
     tabItems(
+      # TAB 1: Overview ----
       tabItem(
         tabName = "overview",
 
-        # Value boxes row
+        # Row 1: Value boxes ----
         fluidRow(
           valueBoxOutput("value_box_total_patients", width = 4),
           valueBoxOutput("value_box_total_hai", width = 4),
           valueBoxOutput("value_box_infections", width = 4)
         ),
 
-        # Info boxes row
+        # Row 2: Information boxes ----
         fluidRow(
           box(
             title = "About BHAI & Healthcare-Associated Infections",
             status = "primary",
             solidHeader = TRUE,
             collapsible = TRUE,
+            collapsed = FALSE,
             width = 6,
             HTML(
-              "<p><strong>Healthcare-Associated Infections (HAIs)</strong> are infections acquired in healthcare settings, not present or incubating at admission.
-               They increase patient morbidity, mortality, and healthcare costs.</p>
-               <p><strong>BHAI</strong> (Burden of Healthcare-Associated Infections) is a systematic methodology to estimate HAI burden in populations, using surveillance data to quantify cases, deaths, and overall population health loss.</p>
-               <p><strong>Point Prevalence Surveys (PPS)</strong> are cross-sectional surveys capturing the frequency and types of HAIs among a defined group of patients at a single point in time.</p>
-               <p>Data shown here is from the <em>German PPS 2011</em> and the <em>European Union PPS</em>.</p>
-               <p>Burden is measured with the following metrics: <strong>Cases</strong>, <strong>Deaths</strong>, <strong>Disability-Adjusted Life Years (DALYs)</strong>,
-               <strong>Years of Life Lost (YLL)</strong>, and <strong>Years Lived with Disability (YLD)</strong>.</p>"
+              "<div style='font-size: 14px; line-height: 1.6;'>
+                <p><strong>Healthcare-Associated Infections (HAIs)</strong> are infections that patients acquire during healthcare delivery in hospitals or other healthcare facilities.
+                These infections were not present or incubating at the time of admission and pose significant challenges to patient safety and healthcare quality.</p>
+
+                <p><strong>BHAI (Burden of Healthcare-Associated Infections)</strong> is a systematic methodology developed to estimate the population-level burden of HAIs.
+                It combines surveillance data with epidemiological modeling to quantify:</p>
+                <ul style='margin-left: 20px;'>
+                  <li>Number of infection cases</li>
+                  <li>Attributable deaths</li>
+                  <li>Overall population health impact</li>
+                </ul>
+
+                <p><strong>Point Prevalence Surveys (PPS)</strong> are one-day cross-sectional surveys that capture the proportion of hospitalized patients with active HAIs.
+                These surveys provide essential data for understanding HAI epidemiology and informing prevention strategies.</p>
+
+                <p><strong>Data Sources:</strong> This dashboard presents results from the German PPS 2011 and the European Union PPS,
+                processed through BHAI methodology to estimate annual burden.</p>
+
+                <hr style='margin: 15px 0; border: 0; border-top: 1px solid #e0e0e0;'>
+
+                <p><strong>Burden Metrics:</strong></p>
+                <ul style='margin-left: 20px;'>
+                  <li><strong>Cases:</strong> Estimated annual number of HAI episodes</li>
+                  <li><strong>Deaths:</strong> Mortality directly attributable to HAIs</li>
+                  <li><strong>DALYs:</strong> Disability-Adjusted Life Years (combines YLL + YLD)</li>
+                  <li><strong>YLL:</strong> Years of Life Lost due to premature mortality</li>
+                  <li><strong>YLD:</strong> Years Lived with Disability due to infection morbidity</li>
+                </ul>
+              </div>"
             )
           ),
+
           box(
             title = "Understanding the Data Fields",
-            status = "primary",
+            status = "info",
             solidHeader = TRUE,
             collapsible = TRUE,
+            collapsed = FALSE,
             width = 6,
             HTML(
-              "<ul>
-                <li><strong>HAI:</strong> Healthcare-Associated Infection</li>
-                <li><strong>PPS:</strong> Point Prevalence Survey</li>
-                <li><strong>Survey Patients:</strong> Total number of patients surveyed</li>
-                <li><strong>HAI Patients:</strong> Number of surveyed patients diagnosed with at least one HAI</li>
-                <li><strong>Infection Types:</strong> The five tracked HAIs in this dataset:
-                  <ul>
-                    <li><strong>HAP:</strong> Hospital-Acquired Pneumonia</li>
-                    <li><strong>SSI:</strong> Surgical Site Infection</li>
-                    <li><strong>BSI:</strong> Bloodstream Infection</li>
-                    <li><strong>UTI:</strong> Urinary Tract Infection</li>
-                    <li><strong>CDI:</strong> Clostridioides difficile Infection</li>
-                  </ul>
-                </li>
-            </ul>"
+              "<div style='font-size: 14px; line-height: 1.6;'>
+                <dl style='margin-left: 10px;'>
+                  <dt style='font-weight: bold; margin-top: 10px;'>HAI (Healthcare-Associated Infection)</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Infections acquired during the course of receiving healthcare treatment</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>PPS (Point Prevalence Survey)</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>One-day survey measuring the proportion of patients with active infections</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>Survey Patients</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Total number of patients included in the prevalence survey</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>HAI Patients</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Number of surveyed patients diagnosed with at least one healthcare-associated infection</dd>
+                </dl>
+
+                <hr style='margin: 15px 0; border: 0; border-top: 1px solid #e0e0e0;'>
+
+                <p style='font-weight: bold; margin-top: 15px;'>Infection Types Tracked:</p>
+                <ul style='margin-left: 20px;'>
+                  <li><strong>HAP:</strong> Hospital-Acquired Pneumonia - Lower respiratory tract infection</li>
+                  <li><strong>SSI:</strong> Surgical Site Infection - Post-operative wound infection</li>
+                  <li><strong>BSI:</strong> Bloodstream Infection - Bacteremia or septicemia</li>
+                  <li><strong>UTI:</strong> Urinary Tract Infection - Often catheter-associated</li>
+                  <li><strong>CDI:</strong> <em>Clostridioides difficile</em> Infection - Antibiotic-associated colitis</li>
+                </ul>
+
+                <div style='background-color: #f0f8ff; padding: 10px; border-radius: 5px; margin-top: 15px;'>
+                  <p style='margin: 0; font-size: 13px;'><strong>Note:</strong> These five infection types represent the most common and clinically significant HAIs monitored in European healthcare settings.</p>
+                </div>
+              </div>"
             )
           )
         ),
 
-        # Treemap box
+        # Row 3: Treemap visualization ----
         fluidRow(
           box(
-            title = "Survey Sample Distribution by HAI Status",
+            title = "Survey Sample Distribution: HAI Prevalence by Country and Infection Type",
             status = "primary",
             solidHeader = TRUE,
             width = 12,
+            HTML("<p style='margin-bottom: 15px; color: #666;'>
+                  This hierarchical visualization shows the distribution of surveyed patients by country,
+                  HAI status, and specific infection types. Larger rectangles represent higher patient counts.
+                  </p>"),
             plotlyOutput("treemap_plot", height = "600px")
           )
-        )
+        ),
+      ),
+
+      # Placeholder tabs ----
+      tabItem(
+        tabName = "estimates",
+        h2("Population Estimates - Coming Soon")
+      ),
+
+      tabItem(
+        tabName = "stratified",
+        h2("Stratified Analysis - Coming Soon")
       )
     )
   )

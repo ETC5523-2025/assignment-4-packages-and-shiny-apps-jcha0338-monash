@@ -6,120 +6,184 @@ library(plotly)
 
 function(input, output, session) {
 
-  # Load dataset
+  # Load dataset from package ----
   data("bhai_pps_sample_distribution", package = "healthburdenr", envir = environment())
-  df <- bhai_pps_sample_distribution
 
-  # Value boxes
+  # Define color palette for infections ----
+  infection_colors <- c(
+    "HAP" = "#4B418E",
+    "SSI" = "#F56A77",
+    "BSI" = "#4062BB",
+    "UTI" = "#EEC7CB",
+    "CDI" = "#59C3C3"
+  )
+
+  # Value Box 1: Total Survey Patients ----
   output$value_box_total_patients <- renderValueBox({
-    total <- df |>
+    total_patients <- bhai_pps_sample_distribution |>
       group_by(country) |>
-      summarise(total = first(num_survey_patients)) |>
-      summarise(sum(total)) |>
-      pull()
+      summarise(country_total = first(num_survey_patients), .groups = "drop") |>
+      summarise(grand_total = sum(country_total)) |>
+      pull(grand_total)
 
     valueBox(
-      formatC(total, big.mark = ","),
+      value = formatC(total_patients, format = "d", big.mark = ","),
       subtitle = "Total Survey Patients",
       icon = icon("users"),
       color = "blue"
     )
   })
 
+  # Value Box 2: Total HAI Patients ----
   output$value_box_total_hai <- renderValueBox({
-    total_hai <- df |>
+    total_hai <- bhai_pps_sample_distribution |>
       summarise(total = sum(num_hai_patients)) |>
-      pull()
+      pull(total)
 
     valueBox(
-      formatC(total_hai, big.mark = ","),
-      subtitle = "Total Patients with HAI",
+      value = formatC(total_hai, format = "d", big.mark = ","),
+      subtitle = "Total HAI Patients",
       icon = icon("hospital"),
       color = "red"
     )
   })
 
+  # Value Box 3: Number of Infection Types ----
   output$value_box_infections <- renderValueBox({
-    num_types <- df |>
+    num_infection_types <- bhai_pps_sample_distribution |>
       distinct(infection) |>
       nrow()
 
     valueBox(
-      num_types,
-      subtitle = "Unique Infection Types Tracked",
+      value = num_infection_types,
+      subtitle = "Infection Types Tracked",
       icon = icon("virus"),
       color = "olive"
     )
   })
 
-  # Prepare treemap data
+  # Prepare hierarchical treemap data ----
   treemap_data <- reactive({
+    df <- bhai_pps_sample_distribution
 
-    # Level 0: Country roots
-    country_totals <- df |>
+    # Level 0: Country roots (top level)
+    country_summary <- df |>
       group_by(country) |>
-      summarise(total_survey = first(num_survey_patients),
-                total_hai = sum(num_hai_patients)) |>
-      ungroup() |>
-      mutate(total_no_hai = total_survey - total_hai)
+      summarise(
+        total_survey = first(num_survey_patients),
+        total_hai = sum(num_hai_patients),
+        .groups = "drop"
+      ) |>
+      mutate(
+        total_unaffected = total_survey - total_hai,
+        prevalence_pct = round((total_hai / total_survey) * 100, 2)
+      )
 
-    level0 <- country_totals |>
+    level0 <- country_summary |>
       mutate(
         id = country,
         label = country,
         parent = "",
         value = total_survey,
-        hover = paste0("Country: ", country, "<br>Total patients: ", total_survey)
+        hover = paste0(
+          "<b>", country, "</b><br>",
+          "Total surveyed: ", formatC(total_survey, format = "d", big.mark = ","), "<br>",
+          "HAI patients: ", formatC(total_hai, format = "d", big.mark = ","), "<br>",
+          "Prevalence: ", prevalence_pct, "%"
+        )
       ) |>
       select(id, label, parent, value, hover)
 
-    # Level 1: HAI / Unaffected by HAIs
-    level1 <- country_totals |>
-      pivot_longer(cols = c(total_hai, total_no_hai),
-                   names_to = "type", values_to = "value") |>
+    # Level 1: HAI status (HAI vs Unaffected)
+    level1 <- country_summary |>
+      pivot_longer(
+        cols = c(total_hai, total_unaffected),
+        names_to = "status",
+        values_to = "value"
+      ) |>
       mutate(
-        label = ifelse(type == "total_hai", "HAI", "Unaffected by HAIs"),
+        status_label = ifelse(status == "total_hai", "HAI", "Unaffected by HAIs"),
+        id = paste(country, status_label, sep = ":"),
         parent = country,
-        id = paste(country, label, sep = ":"),
-        hover = paste0("Country: ", country, "<br>", label, " patients: ", value)
+        pct_of_country = round((value / total_survey) * 100, 2),
+        hover = paste0(
+          "<b>", status_label, "</b><br>",
+          "Country: ", country, "<br>",
+          "Patients: ", formatC(value, format = "d", big.mark = ","), "<br>",
+          "Percentage: ", pct_of_country, "% of surveyed"
+        )
       ) |>
-      select(id, label, parent, value, hover)
+      select(id, label = status_label, parent, value, hover)
 
-    # Level 2: infections under HAI
+    # Level 2: Specific infection types (under HAI only)
     level2 <- df |>
       mutate(
         id = paste(country, "HAI", infection, sep = ":"),
         label = infection,
         parent = paste(country, "HAI", sep = ":"),
-        value = num_hai_patients,
-        hover = paste0("Country: ", country, "<br>HAI Type: ", infection,
-                       "<br>Patients: ", num_hai_patients)
+        value = num_hai_patients
+      ) |>
+      # Calculate percentage within HAI patients
+      left_join(
+        country_summary |> select(country, total_hai),
+        by = "country"
+      ) |>
+      mutate(
+        pct_of_hai = round((value / total_hai) * 100, 2),
+        hover = paste0(
+          "<b>", infection, "</b><br>",
+          "Country: ", country, "<br>",
+          "HAI patients: ", formatC(num_hai_patients, format = "d", big.mark = ","), "<br>",
+          "% of all HAI: ", pct_of_hai, "%<br>",
+          "Survey patients: ", formatC(num_survey_patients, format = "d", big.mark = ",")
+        )
       ) |>
       select(id, label, parent, value, hover)
 
+    # Combine all levels
     bind_rows(level0, level1, level2)
   })
 
-  # Render treemap
+  # Render interactive treemap ----
   output$treemap_plot <- renderPlotly({
-    df_tm <- treemap_data()
+    tm_data <- treemap_data() |>
+      mutate(
+        color = case_when(
+        label == "Unaffected by HAIs" ~ "#4D93BF",
+        label == "HAI" ~ "#F45B69",
+        label %in% c("HAP","SSI","BSI","UTI","CDI") ~ infection_colors[label],
+        TRUE ~ "#EBEBEB"
+      ))
 
     plot_ly(
       type = "treemap",
-      labels = df_tm$label,
-      ids = df_tm$id,
-      parents = df_tm$parent,
-      values = df_tm$value,
-      textinfo = "label+value",
-      hoverinfo = "text",
-      hovertext = df_tm$hover,
+      ids = tm_data$id,
+      labels = tm_data$label,
+      parents = tm_data$parent,
+      values = tm_data$value,
+      text = tm_data$hover,
+      textinfo = "label+value+percent parent",
+      hovertemplate = "%{text}<extra></extra>",
       branchvalues = "total",
       marker = list(
-        colorscale = "Set2",
-        line = list(width = 2, color = "white")
+        colors = tm_data$color,
+        line = list(width = 2, color = "white"),
+        pad = list(t = 30, l = 5, r = 5, b = 5)
+      ),
+      pathbar = list(
+        visible = TRUE,
+        thickness = 30
       )
     ) |>
-      layout(margin = list(t = 30, l = 0, r = 0, b = 0))
+      layout(
+        margin = list(t = 40, l = 5, r = 5, b = 5),
+        font = list(size = 12, family = "Arial, sans-serif")
+      ) |>
+      config(
+        displayModeBar = TRUE,
+        modeBarButtonsToRemove = list("lasso2d", "select2d"),
+        displaylogo = FALSE
+      )
   })
 
 }
