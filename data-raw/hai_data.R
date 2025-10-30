@@ -94,35 +94,31 @@ bhai_eu_pop_est <- bhai.prettyTable(bhai_eu_pps) |>
   mutate(country = "European Union") |>
   mutate(population = bhai_eu_pps@population)
 
-# Helper function to split confidence intervals from formatted strings
-split_ci <- function(x) {
-  tibble(
-    POINT_ESTIMATE = as.integer(str_remove_all(str_extract(x, "^[0-9,]+"), ",")),
-    CI_LOWER_CI = as.integer(str_remove_all(str_extract(x, "(?<=\\()[0-9,]+"), ",")),
-    CI_UPPER_CI = as.integer(str_remove_all(str_extract(x, "(?<=- )[0-9,]+(?=\\))"), ","))
-  )
-}
-
 # Combine and parse confidence intervals
 bhai_pop_est <- rbind(bhai_german_pop_est, bhai_eu_pop_est) |>
-  bind_cols(
-    # Process each column (Cases, Deaths, DALY, YLL, YLD) and split CIs
-    map_dfc(
-      select(bhai_pop_est, Cases, Deaths, DALY, YLL, YLD),
-      split_ci
+    # Extract point, lower, and upper values directly from formatted strings
+    extract(
+      Cases, into = c("cases_point_estimate", "cases_lower_ci", "cases_upper_ci"),
+      regex = "([0-9,]+) \\(([0-9,]+) ?[-–] ?([0-9,]+)\\)"
     ) |>
-      # Rename with descriptive column names
-      set_names(c(
-        "cases_point_estimate", "cases_lower_ci", "cases_upper_ci",
-        "deaths_point_estimate", "deaths_lower_ci", "deaths_upper_ci",
-        "daly_point_estimate", "daly_lower_ci", "daly_upper_ci",
-        "yll_point_estimate", "yll_lower_ci", "yll_upper_ci",
-        "yld_point_estimate", "yld_lower_ci", "yld_upper_ci"
-      ))
-  ) |>
-  # Remove original formatted columns
-  select(-Cases, -Deaths, -DALY, -YLL, -YLD)
-
+    extract(
+      Deaths, into = c("deaths_point_estimate", "deaths_lower_ci", "deaths_upper_ci"),
+      regex = "([0-9,]+) \\(([0-9,]+) ?[-–] ?([0-9,]+)\\)"
+    ) |>
+    extract(
+      DALY, into = c("daly_point_estimate", "daly_lower_ci", "daly_upper_ci"),
+      regex = "([0-9,]+) \\(([0-9,]+) ?[-–] ?([0-9,]+)\\)"
+    ) |>
+    extract(
+      YLL, into = c("yll_point_estimate", "yll_lower_ci", "yll_upper_ci"),
+      regex = "([0-9,]+) \\(([0-9,]+) ?[-–] ?([0-9,]+)\\)"
+    ) |>
+    extract(
+      YLD, into = c("yld_point_estimate", "yld_lower_ci", "yld_upper_ci"),
+      regex = "([0-9,]+) \\(([0-9,]+) ?[-–] ?([0-9,]+)\\)"
+    ) |>
+    # Convert all extracted values to integers (remove commas first)
+    mutate(across(matches("estimate|ci$"), ~ as.integer(str_remove_all(.x, ","))))
 
 # ---- Save all datasets ----
 usethis::use_data(bhai_pps_sample_distribution, bhai_strata_summary, bhai_pop_est, overwrite = TRUE)

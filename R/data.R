@@ -73,7 +73,6 @@
 #' @format A tibble with population estimates by infection and country:
 #' \describe{
 #'   \item{infection}{Type of healthcare-associated infection}
-#'   \item{country}{Country or region (Germany or European Union)}
 #'   \item{cases_point_estimate}{Point estimate for number of cases}
 #'   \item{cases_lower_ci}{Lower 95% confidence interval for cases}
 #'   \item{cases_upper_ci}{Upper 95% confidence interval for cases}
@@ -89,6 +88,8 @@
 #'   \item{yld_point_estimate}{Point estimate for Years Lived with Disability}
 #'   \item{yld_lower_ci}{Lower 95% confidence interval for YLD}
 #'   \item{yld_upper_ci}{Upper 95% confidence interval for YLD}
+#'   \item{country}{Country or region (Germany or European Union)}
+#'   \item{population}{Total Population of the country or region}
 #' }
 #'
 #' @details
