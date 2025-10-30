@@ -3,11 +3,14 @@ library(shinydashboard)
 library(dplyr)
 library(tidyr)
 library(plotly)
+library(DT)
 
 function(input, output, session) {
 
   # Load dataset from package ----
   data("bhai_pps_sample_distribution", package = "healthburdenr", envir = environment())
+  data("bhai_pop_est", package = "healthburdenr", envir = environment())
+  data("bhai_strata_summary", package = "healthburdenr", envir = environment())
 
   # Define color palette for infections ----
   infection_colors <- c(
@@ -185,5 +188,113 @@ function(input, output, session) {
         displaylogo = FALSE
       )
   })
+
+  format_with_ci <- function(point, lower, upper) {
+    paste0(
+      formatC(point, format = "d", big.mark = ","),
+      " (",
+      formatC(lower, format = "d", big.mark = ","),
+      " - ",
+      formatC(upper, format = "d", big.mark = ","),
+      ")"
+    )
+  }
+
+
+  calculate_cfr <- function(deaths, cases) {
+    round(ifelse(cases == 0, 0, (deaths / cases) * 100), 1)
+  }
+
+  # Reactive table
+  output$population_estimates_table <- DT::renderDataTable({
+
+    estimation_summary <- bhai_pop_est |>
+      filter(country == input$country_estimate) |>
+      mutate(
+        CFR = calculate_cfr(deaths_point_estimate, cases_point_estimate),
+        Cases = format_with_ci(cases_point_estimate, cases_lower_ci, cases_upper_ci),
+        Deaths = format_with_ci(deaths_point_estimate, deaths_lower_ci, deaths_upper_ci),
+        DALYs = format_with_ci(daly_point_estimate, daly_lower_ci, daly_upper_ci),
+        YLL = format_with_ci(yll_point_estimate, yll_lower_ci, yll_upper_ci),
+        YLD = format_with_ci(yld_point_estimate, yld_lower_ci, yld_upper_ci),
+        CFR_color = case_when(
+          CFR < 3 ~ "#d4edda",
+          CFR >= 3 & CFR <= 10 ~ "#fff3cd",
+          CFR > 10 ~ "#f8d7da"
+        ),
+        row_color = ifelse(infection == "ALL", "#f2f2f2", "white")
+      )
+
+    DT::datatable(
+      estimation_summary |> select(infection, Cases, Deaths, CFR, DALYs, YLL, YLD),
+      extensions = 'Buttons',
+      options = list(
+        dom = 'Bfrtip',
+        buttons = c('copy', 'csv'),
+        pageLength = 10
+      ),
+      rownames = FALSE,
+      escape = FALSE
+    ) |>
+      DT::formatStyle(
+        'CFR',
+        backgroundColor = DT::styleEqual(estimation_summary$CFR, estimation_summary$CFR_color)
+      ) |>
+      DT::formatStyle(
+        'infection',
+        target = 'row',
+        backgroundColor = DT::styleEqual(estimation_summary$infection, estimation_summary$row_color)
+      )
+  })
+
+  # Reactive filtered data for value boxes (ALL row only)
+  population_summary <- reactive({
+    bhai_pop_est |>
+      filter(country == input$country_estimate, infection == "ALL") |>
+      mutate(
+        CFR = calculate_cfr(deaths_point_estimate, cases_point_estimate)
+      )
+  })
+
+  output$vbox_total_cases <- renderValueBox({
+    row <- population_summary()
+    valueBox(
+      formatC(row$cases_point_estimate, format="d", big.mark=","),
+      subtitle = paste0("Total Cases (95% CI: ", format_with_ci(row$cases_point_estimate, row$cases_lower_ci, row$cases_upper_ci), ")"),
+      icon = icon("procedures"),
+      color = "blue"
+    )
+  })
+
+  output$vbox_total_deaths <- renderValueBox({
+    row <- population_summary()
+    valueBox(
+      formatC(row$deaths_point_estimate, format="d", big.mark=","),
+      subtitle = paste0("Total Deaths (95% CI: ", format_with_ci(row$deaths_point_estimate, row$deaths_lower_ci, row$deaths_upper_ci), ")"),
+      icon = icon("skull-crossbones"),
+      color = "red"
+    )
+  })
+
+  output$vbox_total_dalys <- renderValueBox({
+    row <- population_summary()
+    valueBox(
+      formatC(row$daly_point_estimate, format="d", big.mark=","),
+      subtitle = paste0("Total DALYs (95% CI: ", format_with_ci(row$daly_point_estimate, row$daly_lower_ci, row$daly_upper_ci), ")"),
+      icon = icon("heartbeat"),
+      color = "purple"
+    )
+  })
+
+  output$vbox_overall_cfr <- renderValueBox({
+    row <- population_summary()
+    valueBox(
+      paste0(row$CFR, "%"),
+      subtitle = "Overall Case-Fatality Rate",
+      icon = icon("percent"),
+      color = "orange"
+    )
+  })
+
 
 }

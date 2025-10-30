@@ -137,15 +137,59 @@ dashboardPage(
         ),
       ),
 
-      # Placeholder tabs ----
       tabItem(
         tabName = "estimates",
-        h2("Population Estimates - Coming Soon")
+
+        # Header
+        h2("Population Burden Estimates & Stratified Analysis"),
+        p("Annual burden estimates by country with demographic stratification"),
+
+        # --- Summary Value Boxes ---
+        fluidRow(
+          valueBoxOutput("vbox_total_cases", width = 3),
+          valueBoxOutput("vbox_total_deaths", width = 3),
+          valueBoxOutput("vbox_overall_cfr", width = 3),
+          valueBoxOutput("vbox_total_dalys", width = 3)
+        ),
+
+        # --- Filters ---
+        fluidRow(
+          box(
+            title = "Filters",
+            status = "primary",
+            solidHeader = TRUE,
+            width = 12,
+            column(
+              width = 4,
+              selectInput(
+                "country_estimate", "Select Country/Region:",
+                choices = c("Germany", "European Union"), selected = "Germany"
+              )
+            ),
+            column(
+              width = 4,
+              checkboxInput(
+                "show_detailed_ci", "Show separate CI columns in table", FALSE
+              )
+            )
+          )
+        ),
+
+        # --- Data Table ---
+        fluidRow(
+          box(
+            title = "Detailed Burden Estimates by Infection Type",
+            status = "primary",
+            solidHeader = TRUE,
+            width = 12,
+            DT::dataTableOutput("population_estimates_table")
+          )
+        )
       ),
 
       tabItem(
-        tabName = "stratified",
-        h2("Stratified Analysis - Coming Soon")
+        tabName = "simulation",
+        h2("Simulation")
       )
     )
   )
