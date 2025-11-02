@@ -7,7 +7,7 @@ dashboardPage(
 
   dashboardHeader(
     title = "healthburdenr",
-    titleWidth = 450
+    titleWidth = 250
   ),
 
   dashboardSidebar(
@@ -294,9 +294,72 @@ dashboardPage(
         ),
 
       tabItem(
-        tabName = "simulation",
-        h2("Simulation")
+        tabName = "stratified",
+
+        # Page Header
+        h2("Stratified Demographic Analysis"),
+        p("This tab shows how HAI burden varies by age and sex."),
+
+        # Minimal Control Panel
+        fluidRow(
+          box(
+            title = "Analysis Controls",
+            status = "primary",
+            solidHeader = TRUE,
+            width = 12,
+            column(
+              width = 6,
+              selectInput(
+                inputId = "country_stratified",
+                label = "Select Country/Region:",
+                choices = c("Germany", "European Union"),
+                selected = "Germany"
+              )
+            ),
+            column(
+              width = 6,
+              radioButtons(
+                inputId = "stratified_metric",
+                label = "Metric to Display:",
+                choices = c("Cases" = "ncases", "Deaths" = "ndeath", "DALYs" = "ndaly"),
+                selected = "ncases"
+              )
+            ),
+            column(
+              width = 3,
+              checkboxGroupInput(
+                inputId = "infections_stratified",
+                label = "Select Infections to Display:",
+                choices = unique(bhai_strata_summary$infection),
+                selected = unique(bhai_strata_summary$infection)
+              ),
+            ),
+
+            column(
+              width = 3,
+              selectInput(
+                inputId = "age_group_filter_strat",
+                label = "Age Group Filter:",
+                choices = unique(bhai_strata_summary$age_group),
+                selected = unique(bhai_strata_summary$age_group),
+                multiple = TRUE
+              )
+            )
+          )
+        ),
+
+        # Diverging Bar Chart
+        fluidRow(
+          box(
+            title = "Burden Distribution by Age and Sex",
+            status = "primary",
+            solidHeader = TRUE,
+            width = 12,
+            plotly::plotlyOutput("stratified_diverging_plot", height = "1500px")
+          )
+        )
       )
+
     )
   )
 )

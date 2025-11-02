@@ -15,12 +15,14 @@ function(input, output, session) {
 
   # Define color palette for infections ----
   infection_colors <- c(
-    "HAP" = "#4B418E",
-    "SSI" = "#F56A77",
-    "BSI" = "#4062BB",
-    "UTI" = "#EEC7CB",
-    "CDI" = "#59C3C3"
+    "HAP" = "#f0f921",
+    "SSI" = "#fdb42f",
+    "BSI" = "#5c01a6",
+    "UTI" = "#9c179e",
+    "CDI" = "#ed7953"
   )
+
+  # ===== TAB 1: OVERVIEW =====
 
   # Value Box 1: Total Survey Patients ----
   output$value_box_total_patients <- renderValueBox({
@@ -153,8 +155,8 @@ function(input, output, session) {
     tm_data <- treemap_data() |>
       mutate(
         color = case_when(
-        label == "Unaffected by HAIs" ~ "#4D93BF",
-        label == "HAI" ~ "#F45B69",
+        label == "Unaffected by HAIs" ~ "#0d0887",
+        label == "HAI" ~ "#cc4778",
         label %in% c("HAP","SSI","BSI","UTI","CDI") ~ infection_colors[label],
         TRUE ~ "#EBEBEB"
       ))
@@ -190,6 +192,10 @@ function(input, output, session) {
       )
   })
 
+  # ===== TAB 2: POPULATION ESTIMATES =====
+
+  # Helper functions ----
+
   format_ci_text <- function(lower, upper) {
     paste0("(", comma(lower), " - ", comma(upper), ")")
   }
@@ -203,7 +209,7 @@ function(input, output, session) {
     round(ifelse(cases == 0, 0, (deaths / cases) * 100), 1)
   }
 
-  # Reactive table
+  # Reactive: Population summary ----
   output$population_estimates_table <- DT::renderDataTable({
 
     estimation_summary <- bhai_pop_est |>
@@ -211,7 +217,7 @@ function(input, output, session) {
       mutate(
         CFR = calculate_cfr(deaths_point_estimate, cases_point_estimate),
 
-        # Numeric columns (sortable)
+        # Numeric columns
         Cases = cases_point_estimate,
         Deaths = deaths_point_estimate,
         DALYs = daly_point_estimate,
@@ -244,6 +250,7 @@ function(input, output, session) {
         CFR_color, row_color
       )
 
+    # Population estimates table ----
     DT::datatable(
       estimation_summary |> select(-CFR_color, -row_color),
       extensions = 'Buttons',
@@ -280,6 +287,7 @@ function(input, output, session) {
       )
   })
 
+  # Value boxes (ALL row data) ----
   output$vbox_total_cases <- renderValueBox({
     row <- population_summary()
     valueBox(
@@ -320,7 +328,7 @@ function(input, output, session) {
     )
   })
 
-  # Bubble chart
+  # Bubble plot ----
   output$bubble_plot <- renderPlotly({
     bubble_chart_pop <- bhai_pop_est |>
       filter(
@@ -364,8 +372,89 @@ function(input, output, session) {
         panel.grid.minor = element_blank()
       )
 
+    # Convert to plotly
     ggplotly(bubble_plot, tooltip = "text") |>
       layout(legend = list(title = list(text = "Infection Type")))
+  })
+
+  # Safe filter helper function
+  safe_filter <- function(data, column, values) {
+    if (length(values) > 0) {
+      dplyr::filter(data, !!rlang::sym(column) %in% values)
+    } else {
+      data
+    }
+  }
+
+  filtered_stratified_data <- reactive({
+    bhai_strata_summary |>
+      filter(country == input$country_stratified) |>
+      safe_filter("infection", input$infections_stratified) |>
+      safe_filter("age_group", input$age_group_filter_strat) |>
+      mutate(
+        # Choose metric
+        metric_estimate = case_when(
+          input$stratified_metric == "ncases" ~ ncases_estimate,
+          input$stratified_metric == "ndeath"  ~ ndeath_estimate,
+          input$stratified_metric == "ndaly"   ~ daly_estimate
+        ),
+        metric_lower = case_when(
+          input$stratified_metric == "ncases" ~ ncases_lower_ci,
+          input$stratified_metric == "ndeath" ~ ndeath_lower_ci,
+          input$stratified_metric == "ndaly"  ~ daly_lower_ci
+        ),
+        metric_upper = case_when(
+          input$stratified_metric == "ncases" ~ ncases_upper_ci,
+          input$stratified_metric == "ndeath" ~ ndeath_upper_ci,
+          input$stratified_metric == "ndaly"  ~ daly_upper_ci
+        ),
+        # Mirror Male values to negative for diverging bars
+        metric_value = if_else(sex == "F", -metric_estimate, metric_estimate),
+        error_min = if_else(sex == "F", -metric_lower, metric_lower),
+        error_max = if_else(sex == "F", -metric_upper, metric_upper)
+      )
+  })
+
+  # Diverging Bar Plot
+  output$stratified_diverging_plot <- renderPlotly({
+
+    plot_data <- filtered_stratified_data() |>
+      mutate(
+        tooltip_text = paste0(
+          "Age: ", age_group, "<br>",
+          "Sex: ", sex, "<br>",
+          "Infection: ", infection, "<br>",
+          "Value: ", scales::comma(metric_estimate), "<br>",
+          "95% CI: ", scales::comma(metric_lower), " - ", scales::comma(metric_upper)
+        )
+      )
+
+    gg <- ggplot(plot_data, aes(
+      y = age_group,
+      x = metric_value,
+      fill = infection,
+      text = tooltip_text
+    )) +
+      geom_col(position = position_dodge(width = 0.8)) +
+      geom_errorbar(
+        aes(xmin = error_min, xmax = error_max),
+        width = 0.3,
+        color = "black",
+        position = position_dodge(width = 0.8)
+      ) +
+      scale_x_continuous(labels = abs) +
+      scale_fill_manual(values = infection_colors) +
+      labs(x = "Burden", y = "Age Group", fill = "Infection") +
+      facet_wrap(~sex, ncol = 2, scales = "free_x") +
+      theme_minimal() +
+      theme(
+        strip.text = element_text(size = 14, face = "bold"),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 11),
+        axis.title.x = element_text(size = 13)
+      )
+
+    ggplotly(gg, tooltip = "text")
   })
 
 }
