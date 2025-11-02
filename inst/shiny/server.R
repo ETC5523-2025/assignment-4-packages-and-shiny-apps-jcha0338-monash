@@ -4,6 +4,7 @@ library(dplyr)
 library(tidyr)
 library(plotly)
 library(DT)
+library(scales)
 
 function(input, output, session) {
 
@@ -189,17 +190,14 @@ function(input, output, session) {
       )
   })
 
-  format_with_ci <- function(point, lower, upper) {
-    paste0(
-      formatC(point, format = "d", big.mark = ","),
-      " (",
-      formatC(lower, format = "d", big.mark = ","),
-      " - ",
-      formatC(upper, format = "d", big.mark = ","),
-      ")"
-    )
+  format_ci_text <- function(lower, upper) {
+    paste0("(", comma(lower), " - ", comma(upper), ")")
   }
 
+  format_with_ci <- function(point, lower, upper) {
+    paste0( formatC(point, format = "d", big.mark = ","), " (",
+            formatC(lower, format = "d", big.mark = ","), " - ",
+            formatC(upper, format = "d", big.mark = ","), ")" ) }
 
   calculate_cfr <- function(deaths, cases) {
     round(ifelse(cases == 0, 0, (deaths / cases) * 100), 1)
@@ -212,38 +210,64 @@ function(input, output, session) {
       filter(country == input$country_estimate) |>
       mutate(
         CFR = calculate_cfr(deaths_point_estimate, cases_point_estimate),
-        Cases = format_with_ci(cases_point_estimate, cases_lower_ci, cases_upper_ci),
-        Deaths = format_with_ci(deaths_point_estimate, deaths_lower_ci, deaths_upper_ci),
-        DALYs = format_with_ci(daly_point_estimate, daly_lower_ci, daly_upper_ci),
-        YLL = format_with_ci(yll_point_estimate, yll_lower_ci, yll_upper_ci),
-        YLD = format_with_ci(yld_point_estimate, yld_lower_ci, yld_upper_ci),
+
+        # Numeric columns (sortable)
+        Cases = cases_point_estimate,
+        Deaths = deaths_point_estimate,
+        DALYs = daly_point_estimate,
+        YLL = yll_point_estimate,
+        YLD = yld_point_estimate,
+
+        # CI text columns
+        `Cases CI`  = format_ci_text(cases_lower_ci, cases_upper_ci),
+        `Deaths CI` = format_ci_text(deaths_lower_ci, deaths_upper_ci),
+        `DALYs CI`  = format_ci_text(daly_lower_ci, daly_upper_ci),
+        `YLL CI`    = format_ci_text(yll_lower_ci, yll_upper_ci),
+        `YLD CI`    = format_ci_text(yld_lower_ci, yld_upper_ci),
+
+        # Style colors
         CFR_color = case_when(
           CFR < 3 ~ "#d4edda",
           CFR >= 3 & CFR <= 10 ~ "#fff3cd",
           CFR > 10 ~ "#f8d7da"
         ),
         row_color = ifelse(infection == "ALL", "#f2f2f2", "white")
+      ) |>
+      select(
+        HAI = infection,
+        Cases, `Cases CI`,
+        Deaths, `Deaths CI`,
+        CFR,
+        DALYs, `DALYs CI`,
+        YLL, `YLL CI`,
+        YLD, `YLD CI`,
+        CFR_color, row_color
       )
 
     DT::datatable(
-      estimation_summary |> select(infection, Cases, Deaths, CFR, DALYs, YLL, YLD),
+      estimation_summary |> select(-CFR_color, -row_color),
       extensions = 'Buttons',
       options = list(
         dom = 'Bfrtip',
-        buttons = c('copy', 'csv'),
+        buttons = c('copy','csv'),
         pageLength = 10
       ),
-      rownames = FALSE,
-      escape = FALSE
+      rownames = FALSE
     ) |>
+      DT::formatCurrency(
+        c("Cases","Deaths","DALYs","YLL","YLD"),
+        currency = "",
+        digits = 0,
+        mark = ","
+      ) |>
       DT::formatStyle(
         'CFR',
         backgroundColor = DT::styleEqual(estimation_summary$CFR, estimation_summary$CFR_color)
       ) |>
       DT::formatStyle(
-        'infection',
+        'HAI',
         target = 'row',
-        backgroundColor = DT::styleEqual(estimation_summary$infection, estimation_summary$row_color)
+        backgroundColor = DT::styleEqual(estimation_summary$HAI, estimation_summary$row_color)
       )
   })
 
@@ -296,5 +320,52 @@ function(input, output, session) {
     )
   })
 
+  # Bubble chart
+  output$bubble_plot <- renderPlotly({
+    bubble_chart_pop <- bhai_pop_est |>
+      filter(
+        country == input$country_estimate,
+        infection != "ALL"
+      ) |>
+      mutate(
+        CFR = calculate_cfr(deaths_point_estimate, cases_point_estimate),
+        infection = factor(infection)
+      )
+
+    bubble_plot <- ggplot(
+      bubble_chart_pop,
+      aes(
+        x = cases_point_estimate,
+        y = deaths_point_estimate,
+        size = daly_point_estimate * 10,
+        color = infection,
+        text = paste0(
+          "<b>", infection, "</b><br>",
+          "Cases: ", comma(cases_point_estimate), "<br>",
+          "Deaths: ", comma(deaths_point_estimate), "<br>",
+          "DALYs: ", comma(daly_point_estimate), "<br>",
+          "CFR: ", CFR, "%"
+        )
+      )
+    ) +
+      geom_point(alpha = 0.8) +
+      scale_size_continuous(range = c(5, 10)) +
+      scale_x_continuous(labels = comma) +
+      scale_y_continuous(labels = comma) +
+      labs(
+        x = "Cases",
+        y = "Deaths",
+        size = "DALYs",
+        color = "HAI"
+      ) +
+      theme_minimal(base_size = 14) +
+      theme(
+        legend.position = "right",
+        panel.grid.minor = element_blank()
+      )
+
+    ggplotly(bubble_plot, tooltip = "text") |>
+      layout(legend = list(title = list(text = "Infection Type")))
+  })
 
 }

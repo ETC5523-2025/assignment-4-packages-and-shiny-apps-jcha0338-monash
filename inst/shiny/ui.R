@@ -6,7 +6,7 @@ dashboardPage(
   skin = "blue",
 
   dashboardHeader(
-    title = "BHAI: Healthcare-Associated Infections Dashboard",
+    title = "healthburdenr",
     titleWidth = 450
   ),
 
@@ -137,14 +137,22 @@ dashboardPage(
         ),
       ),
 
+      # TAB 2: Population Estimates ----
       tabItem(
         tabName = "estimates",
 
-        # Header
-        h2("Population Burden Estimates & Stratified Analysis"),
-        p("Annual burden estimates by country with demographic stratification"),
+        # Header with better description
+        fluidRow(
+          column(12,
+                 h2("Population Burden Estimates", style = "margin-top: 0;"),
+                 p(style = "font-size: 15px; color: #666; margin-bottom: 20px;",
+                   "Annual burden estimates derived from BHAI modeling, showing cases, deaths, and disability-adjusted life years (DALYs) by infection type. ",
+                   "The 'ALL' row represents the aggregate burden across all five HAI types."
+                 )
+          )
+        ),
 
-        # --- Summary Value Boxes ---
+        # Summary Value Boxes (using ALL row)
         fluidRow(
           valueBoxOutput("vbox_total_cases", width = 3),
           valueBoxOutput("vbox_total_deaths", width = 3),
@@ -152,40 +160,138 @@ dashboardPage(
           valueBoxOutput("vbox_total_dalys", width = 3)
         ),
 
-        # --- Filters ---
+        # Main content: Filter + Tabbed outputs
         fluidRow(
-          box(
-            title = "Filters",
-            status = "primary",
-            solidHeader = TRUE,
-            width = 12,
-            column(
-              width = 4,
+          # Filter Box
+          column(
+            width = 3,
+            box(
+              title = "Filters",
+              status = "primary",
+              solidHeader = TRUE,
+              width = NULL,
+
               selectInput(
-                "country_estimate", "Select Country/Region:",
-                choices = c("Germany", "European Union"), selected = "Germany"
-              )
+                "country_estimate",
+                "Select Country/Region:",
+                choices = c("Germany", "European Union"),
+                selected = "Germany"
+              ),
+
+              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+
+              HTML("<p style='font-size: 13px; color: #666; margin-bottom: 5px;'><strong>Data Notes:</strong></p>"),
+              HTML("<ul style='font-size: 12px; color: #666; margin-left: 15px; line-height: 1.5;'>
+                <li>Values are point estimates with 95% confidence intervals</li>
+                <li>'ALL' row shows total burden across all HAI types</li>
+                <li>CFR = Case-Fatality Rate (%)</li>
+              </ul>")
             ),
-            column(
-              width = 4,
-              checkboxInput(
-                "show_detailed_ci", "Show separate CI columns in table", FALSE
+
+            box(
+              title = "Understanding Burden Metrics",
+              status = "warning",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed = FALSE,
+              width = NULL,
+              HTML("
+              <div style='font-size: 14px; line-height: 1.6;'>
+                <dl style='margin-left: 10px;'>
+                  <dt style='font-weight: bold; margin-top: 10px;'>Point Estimate</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>The most likely value from BHAI simulation (median of 500 simulations)</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>95% Confidence Interval (CI)</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Range within which the true value likely falls with 95% probability. Wider intervals indicate greater uncertainty.</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>Cases</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Estimated annual number of HAI episodes in the population</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>Deaths</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Annual mortality directly attributable to HAIs (excess deaths beyond background mortality)</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>Case-Fatality Rate (CFR)</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Percentage of HAI cases that result in death (Deaths ÷ Cases × 100). Higher CFR indicates more lethal infections.</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>DALYs (Disability-Adjusted Life Years)</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Combined measure of population health loss from both mortality and morbidity. One DALY = one lost year of healthy life. Calculated as YLL + YLD.</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>YLL (Years of Life Lost)</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Years lost due to premature death from HAI, calculated using standard life expectancy</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>YLD (Years Lived with Disability)</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Years lived with reduced quality of life due to HAI morbidity and long-term health consequences</dd>
+
+                  <dt style='font-weight: bold; margin-top: 10px;'>ALL (Aggregate Row)</dt>
+                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Sum of all five HAI types (BSI, HAP, SSI, UTI, CDI) - represents total HAI burden</dd>
+                </dl>
+              </div>
+            ")
+            )
+          ),
+
+          # Tabbed Outputs (right main panel)
+          column(
+            width = 9,
+            box(
+              title = NULL,
+              status = "primary",
+              solidHeader = FALSE,
+              width = NULL,
+
+              tabsetPanel(
+                id = "estimates_tabs",
+                type = "tabs",
+
+                # Tab 1: Data Table
+                tabPanel(
+                  title = "Data Table",
+                  icon = icon("table"),
+                  value = "table",
+
+                  br(),
+                  HTML("<p style='margin-bottom: 15px; color: #666;'>
+                    Detailed estimates for all infections. The 'ALL' row is highlighted in gray.
+                    CFR (Case-Fatality Rate) is color-coded: <span style='background: #d4edda; padding: 2px 6px;'>&lt;3%</span>,
+                    <span style='background: #fff3cd; padding: 2px 6px;'>3-10%</span>,
+                    <span style='background: #f8d7da; padding: 2px 6px;'>&gt;10%</span>
+                  </p>"),
+                  DT::dataTableOutput("population_estimates_table")
+                ),
+
+                # Tab 2: Bubble Plot
+                tabPanel(
+                  title = "Bubble Chart",
+                  icon = icon("dot-circle"),
+                  value = "bubble",
+
+                  br(),
+
+                  # Center the plot with better sizing
+                  div(
+                    style = "display: flex; justify-content: center; align-items: center;",
+                    plotlyOutput("bubble_plot", height = "550px", width = "100%")
+                  ),
+
+                  # Interpretation guide below plot
+                  hr(style = "margin: 20px 0;"),
+                  HTML("
+                    <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 13px;'>
+                      <strong>Interpretation Tips:</strong>
+                      <ul style='margin: 10px 0 5px 20px; line-height: 1.6;'>
+                        <li><strong>Position matters:</strong> Infections higher on the Y-axis relative to X-axis have higher case-fatality rates</li>
+                        <li><strong>Bubble size indicates total burden:</strong> Large bubbles represent infections with substantial DALY impact</li>
+                        <li><strong>Prevention priorities:</strong> Focus on infections that are both high-incidence (far right) and high-mortality (high up)</li>
+                        <li><strong>Hover for details:</strong> Move your cursor over bubbles to see exact numbers and calculated CFR</li>
+                      </ul>
+                    </div>
+                  ")
+                )
               )
             )
           )
-        ),
-
-        # --- Data Table ---
-        fluidRow(
-          box(
-            title = "Detailed Burden Estimates by Infection Type",
-            status = "primary",
-            solidHeader = TRUE,
-            width = 12,
-            DT::dataTableOutput("population_estimates_table")
-          )
         )
-      ),
+        ),
 
       tabItem(
         tabName = "simulation",
