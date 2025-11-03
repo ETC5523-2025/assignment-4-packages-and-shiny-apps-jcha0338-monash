@@ -8,7 +8,6 @@ Description: Provides tools and interactive visualizations for exploring
     prevalence survey data from European acute-care hospitals (2011-2012). 
     Includes population estimates, stratified analyses, and disability-adjusted 
     life years (DALYs) calculations. Based on Zacher et al.(2019) 
-    <doi:10.2807/1560-7917.ES.2019.24.46.1900135>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
