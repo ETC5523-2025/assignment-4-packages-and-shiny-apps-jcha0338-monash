@@ -49,7 +49,7 @@ You can install `healthburdenr` from GitHub:
 install.packages("remotes")
 
 # Install healthburdenr
-remotes::install_github("yourusername/healthburdenr")
+remotes::install_github("ETC5523-2025/assignment-4-packages-and-shiny-apps-jcha0338-monash")
 ```
 
 ## Load the packages:

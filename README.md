@@ -20,7 +20,8 @@ this package estimates the burden of five common HAIs using
 disability-adjusted life years (DALYs) using 500 Monte Carlo
 Simulations.
 
-**📊 Package Website:** [healthburdenr]()
+**📊 Package Website:**
+[healthburdenr](https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-jcha0338-monash/)
 
 ## Features
 
@@ -38,7 +39,7 @@ Install the development version from GitHub:
 
 ``` r
 install.packages("remotes")
-remotes::install_github("")
+remotes::install_github("ETC5523-2025/assignment-4-packages-and-shiny-apps-jcha0338-monash")
 ```
 
 ## Quick Start
@@ -125,6 +126,5 @@ arrange(desc(cfr))
 
 ## Documentation
 
-- [**Get Started**]() - Introduction vignette
-- [**Function Reference**]() - Complete documentation
-- [**Package Website**]() - Full documentation site
+- [**Package
+  Website**](https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-jcha0338-monash/)
