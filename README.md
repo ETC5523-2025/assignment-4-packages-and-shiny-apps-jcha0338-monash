@@ -5,49 +5,126 @@
 
 <!-- badges: start -->
 
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-The goal of healthburdenr is to …
+## Overview
+
+The **healthburdenr** package provides interactive dashboard for
+exploring healthcare-associated infection (HAI) burden data from the
+2011-2012 European Point Prevalence Survey. Based on the methodology
+from [Zacher et
+al. (2019)](https://doi.org/10.2807/1560-7917.ES.2019.24.46.1900135),
+this package estimates the burden of five common HAIs using
+disability-adjusted life years (DALYs) using 500 Monte Carlo
+Simulations.
+
+**📊 Package Website:** [healthburdenr]()
+
+## Features
+
+- 📊 **Three curated datasets** on HAI burden in Germany and EU
+- 🎨 **Interactive Shiny dashboard** with treemaps, bubble charts, and
+  stratified visualizations
+- 📈 **Population estimates** with 95% confidence intervals
+- 👥 **Demographic analyses** stratified by age and sex
+- 🔧 **Data transformation utilities** for BHAI S4 objects
+- 📝 **Comprehensive documentation** and vignettes
 
 ## Installation
 
-You can install the development version of healthburdenr from
-[GitHub](https://github.com/) with:
+Install the development version from GitHub:
 
 ``` r
-# install.packages("pak")
-pak::pak("ETC5523-2025/assignment-4-packages-and-shiny-apps-jcha0338-monash")
+install.packages("remotes")
+remotes::install_github("")
 ```
 
-## Example
-
-This is a basic example which shows you how to solve a common problem:
+## Quick Start
 
 ``` r
-# library(healthburdenr)
-## basic example code
+library(healthburdenr)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+### Explore population-level burden estimates
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+data(bhai_pop_est)
+head(bhai_pop_est)
 ```
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+### View survey sample distribution
 
-You can also embed plots, for example:
+``` r
+data(bhai_pps_sample_distribution)
+```
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+### Launch interactive dashboard
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+``` r
+run_app()
+```
+
+## Infection Types
+
+The package covers five major healthcare-associated infections:
+
+| Abbreviation | Full Name | Description |
+|----|----|----|
+| **HAP** | Hospital-acquired pneumonia | Lower respiratory tract infection |
+| **SSI** | Surgical site infection | Post-operative wound infection |
+| **BSI** | Bloodstream infection | Bacteremia or septicemia |
+| **UTI** | Urinary tract infection | Often catheter-associated |
+| **CDI** | *Clostridioides difficile* infection | Antibiotic-associated colitis |
+
+## Interactive Dashboard
+
+Launch the Shiny dashboard to explore the data interactively:
+
+``` r
+run_app()
+```
+
+The dashboard includes three main views:
+
+1.  **Overview** - Hierarchical treemap showing survey sample
+    distribution by country and infection type
+2.  **Population Estimates** - Bubble charts and detailed tables with
+    burden metrics (cases, deaths, DALYs)
+3.  **Stratified Analysis** - Diverging bar charts showing demographic
+    patterns by age group and sex
+
+## Example Analysis
+
+Calculate case-fatality rates by infection type:
+
+``` r
+library(dplyr)
+
+bhai_pop_est |>
+filter(country == "Germany", infection != "ALL") |>
+mutate(cfr = (deaths_point_estimate / cases_point_estimate) * 100) |>
+select(infection, cases_point_estimate, deaths_point_estimate, cfr) |>
+arrange(desc(cfr))
+```
+
+## Available Datasets
+
+- **`bhai_pop_est`** - Population-level burden estimates with point
+  estimates and 95% CIs
+- **`bhai_pps_sample_distribution`** - Survey sample distribution
+  showing HAI prevalence
+- **`bhai_strata_summary`** - Demographic stratification by age group
+  and sex
+
+## Functions
+
+- **`run_app()`** - Launch the interactive Shiny dashboard
+- **`flatten_pps()`** - Convert BHAI S4 objects to tidy tibbles
+
+## Documentation
+
+- [**Get Started**]() - Introduction vignette
+- [**Function Reference**]() - Complete documentation
+- [**Package Website**]() - Full documentation site
