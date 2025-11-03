@@ -88,21 +88,25 @@ Expand these if you're new to HAI surveillance or need clarification on terminol
 The main feature of this tab is a hierarchical treemap showing:
 
 **Structure:**
+
 - **Top level**: Countries (Germany, European Union)
 - **Second level**: HAI status (patients with HAI vs. unaffected)
 - **Bottom level**: Specific infection types (HAP, SSI, BSI, UTI, CDI)
 
 **How to interact:**
+
 - **Hover**: Move your mouse over any rectangle to see exact numbers and percentages
 - **Click**: Click on rectangles to zoom in and explore that segment
 - **Breadcrumb**: Use the breadcrumb trail at the top to navigate back
 
 **Color coding:**
+
 - Blue shades: Unaffected patients
 - Red/warm tones: Patients with HAI
 - Distinct colors: Each infection type
 
 **What to look for:**
+
 - **Relative sizes**: Larger boxes = more patients
 - **Prevalence**: Compare "HAI" vs. "Unaffected" sections to see overall infection rates
 - **Common infections**: Identify which infections affect the most patients
@@ -115,6 +119,7 @@ The main feature of this tab is a hierarchical treemap showing:
 2. **Infection distribution**: Within the HAI section, the largest rectangles show which infections are most commonly found
 
 3. **Geographic variation**: Differences between Germany and EU may reflect:
+
    - Different healthcare systems
    - Different patient populations
    - Survey methodology variations
@@ -149,10 +154,12 @@ These provide a high-level view of total HAI impact in the selected country.
 #### Control Panel
 
 **Country/Region Filter:**
+
 - Select "Germany" or "European Union"
 - All outputs update immediately when changed
 
 **Data Notes:**
+
 - Quick reference for understanding value displays
 - Reminds you about confidence intervals and the "ALL" row
 
@@ -165,16 +172,20 @@ The main panel has two tabs:
 A comprehensive table showing all burden metrics:
 
 **Features:**
+
 - Sortable columns (click headers)
 - Searchable (use search box)
 - Download buttons (Copy or CSV)
 - Color-coded CFR (Case-Fatality Rate):
+
   - Green (<3%): Lower mortality
   - Yellow (3-10%): Moderate mortality
   - Red (>10%): Higher mortality
+
 - Gray highlighting for "ALL" row (aggregate)
 
 **Columns:**
+
 - HAI: Infection type
 - Cases: Point estimate with 95% CI
 - Deaths: Point estimate with 95% CI
@@ -182,6 +193,7 @@ A comprehensive table showing all burden metrics:
 - DALYs, YLL, YLD: Population health loss metrics with CIs
 
 **How to use:**
+
 1. Sort by deaths to identify deadliest infections
 2. Sort by cases to identify most common infections
 3. Compare CIs to understand uncertainty
@@ -192,12 +204,14 @@ A comprehensive table showing all burden metrics:
 An interactive scatter plot showing relationships between burden metrics:
 
 **Axes:**
+
 - **X-axis**: Number of cases (annual incidence)
 - **Y-axis**: Number of deaths (annual mortality)
 - **Bubble size**: DALY burden (larger = more population health loss)
 - **Color**: Infection type (consistent with Overview tab)
 
 **How to interact:**
+
 - **Hover**: See exact values, including confidence intervals and CFR
 - **Zoom**: Use plotly toolbar to zoom and pan
 - **Download**: Save as PNG using camera icon in toolbar
@@ -205,24 +219,29 @@ An interactive scatter plot showing relationships between burden metrics:
 **What to look for:**
 
 1. **High burden infections**: Large bubbles in the top-right
+
    - High incidence AND high mortality
    - Priority for prevention efforts
 
 2. **High mortality rate**: Infections high on Y-axis relative to X-axis
+
    - Fewer cases but more lethal
    - May need specialized treatment protocols
 
 3. **High incidence**: Infections far to the right
+
    - Many cases but lower mortality
    - May still have high DALY burden due to volume
 
 4. **Overall burden**: Bubble size shows combined impact
+
    - Large bubbles are high priority regardless of position
    - Consider both frequency and severity
 
 **Example interpretation:**
 
 If BSI (Bloodstream Infection) appears as a large bubble in the top-right:
+
 - High number of cases 
 - High number of deaths
 - Large DALY burden
@@ -231,6 +250,7 @@ If BSI (Bloodstream Infection) appears as a large bubble in the top-right:
 #### Interpretation Box
 
 A gray box provides tips for understanding the visualization:
+
 - Position interpretation
 - Bubble size meaning
 - Prevention priorities
@@ -267,30 +287,36 @@ This allows identification of vulnerable populations and targeting of prevention
 ### Layout
 
 **Left Column:**
+
 - Control panel (filters)
 - Interpretation guide (collapsible)
 - Glossary (collapsible)
 
 **Right Column:**
+
 - Diverging bar chart visualization
 
 ### Control Panel
 
 **Country/Region:**
+
 - Select Germany or European Union
 - Updates all outputs
 
 **Metric to Display:**
+
 - **Cases**: Number of infection episodes
 - **Deaths**: Number of deaths
 - **DALYs**: Disability-Adjusted Life Years
 
 **Select Infections:**
+
 - Check/uncheck infections to display
 - **Tip**: Select 1-3 infections for best readability
 - More than 3 can make the chart crowded
 
 **Age Group Filter:**
+
 - Select specific age groups or "All"
 - Use this to focus on particular age ranges
 - Multiple selection allowed
@@ -298,6 +324,7 @@ This allows identification of vulnerable populations and targeting of prevention
 ### Diverging Bar Chart
 
 **Structure:**
+
 - **Left panel (F)**: Female burden, bars extend right
 - **Right panel (M)**: Male burden, bars extend right
 - **Y-axis**: Age groups (youngest at bottom, oldest at top)
@@ -314,37 +341,44 @@ This allows identification of vulnerable populations and targeting of prevention
 3. **Grouped bars**: When multiple infections selected, they appear side-by-side within each age group
 
 4. **Error bars**: Wider error bars = more uncertainty
+
    - Common in very young (0-1) and very old (85+) groups due to smaller samples
 
 **What to look for:**
 
 1. **Age patterns**:
+
    - Which age groups have the longest bars?
    - Is burden concentrated in elderly (typical)?
    - Are there unexpected patterns in younger groups?
 
 2. **Sex differences**:
+
    - Are bars consistently longer on one side?
    - Do patterns differ by infection type?
    - Are sex differences larger in certain age groups?
 
 3. **Infection-specific patterns**:
+
    - Do different infections show different age distributions?
    - Which infections primarily affect elderly?
    - Which infections are more evenly distributed?
 
 4. **Uncertainty**:
+
    - Which groups have wide confidence intervals?
    - Where is more data/surveillance needed?
 
 **Example interpretation:**
 
 If you see:
+
 - Very long bars for ages 65-84 and 85+
 - Slightly longer bars on the male side
 - Wide error bars for age 0-1
 
 **Conclusion**:
+
 - Elderly populations (65+) carry the highest burden (typical finding)
 - Males may have slightly higher burden than females (could be due to healthcare utilization or biological factors)
 - Infant data has high uncertainty (may need more surveillance in this group)
@@ -352,6 +386,7 @@ If you see:
 ### Interpretation Guide
 
 Located below the control panel, this box provides:
+
 - Key insights to look for
 - Clinical implications
 - Statistical notes
@@ -362,6 +397,7 @@ Located below the control panel, this box provides:
 ### Glossary (Collapsible)
 
 Provides quick definitions of technical terms:
+
 - Stratification
 - Age groups
 - Stratum
@@ -369,8 +405,6 @@ Provides quick definitions of technical terms:
 - Confidence intervals
 - Error bars
 - Faceting
-
-**Use this** as a reference when encountering unfamiliar terminology.
 
 ---
 
@@ -391,13 +425,6 @@ All visualizations are interactive:
 - **Click**: Interact with elements (zoom in treemap, etc.)
 - **Zoom/Pan**: Use plotly toolbar on charts
 - **Download**: Export visualizations and data
-
-### Responsive Design
-
-The dashboard adapts to different screen sizes:
-- Desktop: Full layout with all features visible
-- Tablet: Stacked layout, scrollable
-- Mobile: Single column, optimized for touch
 
 ### Performance Tips
 
@@ -423,11 +450,12 @@ Wide confidence intervals occur when:
 This is normal and indicates areas where more surveillance data could improve precision.
 
 ### What does the "`ALL`" row mean?
+
 The "`ALL`" row in the Population Estimates tab represents the sum of the five infection types (HAP, SSI, BSI, UTI, CDI). It's not a separate category, but rather the total HAI burden across all tracked infections.
 
 *Important:* The "`ALL`" row does NOT appear in stratified data, since stratification is done for individual infections.
 
-Can I export the data?
+### Can I export the data?
 
 Yes! Multiple export options:
 
