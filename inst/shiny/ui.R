@@ -37,104 +37,110 @@ dashboardPage(
           valueBoxOutput("value_box_infections", width = 4)
         ),
 
-        # Row 2: Information boxes ----
+        # Row 2 & 3 merged: Info boxes on left, treemap on right ----
         fluidRow(
-          box(
-            title = "About BHAI & Healthcare-Associated Infections",
-            status = "primary",
-            solidHeader = TRUE,
-            collapsible = TRUE,
-            collapsed = FALSE,
-            width = 6,
-            HTML(
-              "<div style='font-size: 14px; line-height: 1.6;'>
-                <p><strong>Healthcare-Associated Infections (HAIs)</strong> are infections that patients acquire during healthcare delivery in hospitals or other healthcare facilities.
-                These infections were not present or incubating at the time of admission and pose significant challenges to patient safety and healthcare quality.</p>
 
-                <p><strong>BHAI (Burden of Healthcare-Associated Infections)</strong> is a systematic methodology developed to estimate the population-level burden of HAIs.
-                It combines surveillance data with epidemiological modeling to quantify:</p>
-                <ul style='margin-left: 20px;'>
-                  <li>Number of infection cases</li>
-                  <li>Attributable deaths</li>
-                  <li>Overall population health impact</li>
-                </ul>
+          # LEFT COLUMN: two info panels stacked
+          column(
+            width = 3,
 
-                <p><strong>Point Prevalence Surveys (PPS)</strong> are one-day cross-sectional surveys that capture the proportion of hospitalized patients with active HAIs.
-                These surveys provide essential data for understanding HAI epidemiology and informing prevention strategies.</p>
+            box(
+              title = "About BHAI & Healthcare-Associated Infections",
+              status = "primary",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed = FALSE,
+              width = 12,
+              HTML(
+                "<div style='font-size: 14px; line-height: 1.6;'>
+                  <p><strong>Healthcare-Associated Infections (HAIs)</strong> are infections that patients acquire during healthcare delivery in hospitals or other healthcare facilities.
+                  These infections were not present or incubating at the time of admission and pose significant challenges to patient safety and healthcare quality.</p>
 
-                <p><strong>Data Sources:</strong> This dashboard presents results from the German PPS 2011 and the European Union PPS,
-                processed through BHAI methodology to estimate annual burden.</p>
+                  <p><strong>BHAI (Burden of Healthcare-Associated Infections)</strong> is a systematic methodology developed to estimate the population-level burden of HAIs.
+                  It combines surveillance data with epidemiological modeling to quantify:</p>
+                  <ul style='margin-left: 20px;'>
+                    <li>Number of infection cases</li>
+                    <li>Attributable deaths</li>
+                    <li>Overall population health impact</li>
+                  </ul>
 
-                <hr style='margin: 15px 0; border: 0; border-top: 1px solid #e0e0e0;'>
+                  <p><strong>Point Prevalence Surveys (PPS)</strong> are one-day cross-sectional surveys that capture the proportion of hospitalized patients with active HAIs.
+                  These surveys provide essential data for understanding HAI epidemiology and informing prevention strategies.</p>
 
-                <p><strong>Burden Metrics:</strong></p>
-                <ul style='margin-left: 20px;'>
-                  <li><strong>Cases:</strong> Estimated annual number of HAI episodes</li>
-                  <li><strong>Deaths:</strong> Mortality directly attributable to HAIs</li>
-                  <li><strong>DALYs:</strong> Disability-Adjusted Life Years (combines YLL + YLD)</li>
-                  <li><strong>YLL:</strong> Years of Life Lost due to premature mortality</li>
-                  <li><strong>YLD:</strong> Years Lived with Disability due to infection morbidity</li>
-                </ul>
-              </div>"
+                  <p><strong>Data Sources:</strong> This dashboard presents results from the German PPS 2011 and the European Union PPS,
+                  processed through BHAI methodology to estimate annual burden.</p>
+
+                  <hr style='margin: 15px 0; border: 0; border-top: 1px solid #e0e0e0;'>
+
+                  <p><strong>Burden Metrics:</strong></p>
+                  <ul style='margin-left: 20px;'>
+                    <li><strong>Cases:</strong> Estimated annual number of HAI episodes</li>
+                    <li><strong>Deaths:</strong> Mortality directly attributable to HAIs</li>
+                    <li><strong>DALYs:</strong> Disability-Adjusted Life Years (combines YLL + YLD)</li>
+                    <li><strong>YLL:</strong> Years of Life Lost due to premature mortality</li>
+                    <li><strong>YLD:</strong> Years Lived with Disability due to infection morbidity</li>
+                  </ul>
+                </div>"
+              )
             )
           ),
 
-          box(
-            title = "Understanding the Data Fields",
-            status = "info",
-            solidHeader = TRUE,
-            collapsible = TRUE,
-            collapsed = FALSE,
-            width = 6,
-            HTML(
-              "<div style='font-size: 14px; line-height: 1.6;'>
-                <dl style='margin-left: 10px;'>
-                  <dt style='font-weight: bold; margin-top: 10px;'>HAI (Healthcare-Associated Infection)</dt>
-                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Infections acquired during the course of receiving healthcare treatment</dd>
+          # RIGHT COLUMN: treemap ----
+          column(
+            width = 9,
+            box(
+              title = "Survey Sample Distribution: HAI Prevalence by Country and Infection Type",
+              status = "primary",
+              solidHeader = TRUE,
+              width = 12,
+              HTML("<p style='margin-bottom: 15px; color: #666;'>
+                    This hierarchical visualization shows the distribution of surveyed patients by country,
+                    HAI status, and specific infection types. Larger rectangles represent higher patient counts.
+                  </p>"),
+              plotlyOutput("treemap_plot", height = "600px")
+            ),
+            box(
+              title = "Understanding the Data Fields",
+              status = "info",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed = FALSE,
+              width = 12,
+              HTML(
+                "<div style='font-size: 14px; line-height: 1.6;'>
+                  <dl style='margin-left: 10px;'>
+                    <dt style='font-weight: bold; margin-top: 10px;'>HAI (Healthcare-Associated Infection)</dt>
+                    <dd style='margin-left: 20px; margin-bottom: 10px;'>Infections acquired during the course of receiving healthcare treatment</dd>
 
-                  <dt style='font-weight: bold; margin-top: 10px;'>PPS (Point Prevalence Survey)</dt>
-                  <dd style='margin-left: 20px; margin-bottom: 10px;'>One-day survey measuring the proportion of patients with active infections</dd>
+                    <dt style='font-weight: bold; margin-top: 10px;'>PPS (Point Prevalence Survey)</dt>
+                    <dd style='margin-left: 20px; margin-bottom: 10px;'>One-day survey measuring the proportion of patients with active infections</dd>
 
-                  <dt style='font-weight: bold; margin-top: 10px;'>Survey Patients</dt>
-                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Total number of patients included in the prevalence survey</dd>
+                    <dt style='font-weight: bold; margin-top: 10px;'>Survey Patients</dt>
+                    <dd style='margin-left: 20px; margin-bottom: 10px;'>Total number of patients included in the prevalence survey</dd>
 
-                  <dt style='font-weight: bold; margin-top: 10px;'>HAI Patients</dt>
-                  <dd style='margin-left: 20px; margin-bottom: 10px;'>Number of surveyed patients diagnosed with at least one healthcare-associated infection</dd>
-                </dl>
+                    <dt style='font-weight: bold; margin-top: 10px;'>HAI Patients</dt>
+                    <dd style='margin-left: 20px; margin-bottom: 10px;'>Number of surveyed patients diagnosed with at least one healthcare-associated infection</dd>
+                  </dl>
 
-                <hr style='margin: 15px 0; border: 0; border-top: 1px solid #e0e0e0;'>
+                  <hr style='margin: 15px 0; border: 0; border-top: 1px solid #e0e0e0;'>
 
-                <p style='font-weight: bold; margin-top: 15px;'>Infection Types Tracked:</p>
-                <ul style='margin-left: 20px;'>
-                  <li><strong>HAP:</strong> Hospital-Acquired Pneumonia - Lower respiratory tract infection</li>
-                  <li><strong>SSI:</strong> Surgical Site Infection - Post-operative wound infection</li>
-                  <li><strong>BSI:</strong> Bloodstream Infection - Bacteremia or septicemia</li>
-                  <li><strong>UTI:</strong> Urinary Tract Infection - Often catheter-associated</li>
-                  <li><strong>CDI:</strong> <em>Clostridioides difficile</em> Infection - Antibiotic-associated colitis</li>
-                </ul>
+                  <p style='font-weight: bold; margin-top: 15px;'>Infection Types Tracked:</p>
+                  <ul style='margin-left: 20px;'>
+                    <li><strong>HAP:</strong> Hospital-Acquired Pneumonia - Lower respiratory tract infection</li>
+                    <li><strong>SSI:</strong> Surgical Site Infection - Post-operative wound infection</li>
+                    <li><strong>BSI:</strong> Bloodstream Infection - Bacteremia or septicemia</li>
+                    <li><strong>UTI:</strong> Urinary Tract Infection - Often catheter-associated</li>
+                    <li><strong>CDI:</strong> <em>Clostridioides difficile</em> Infection - Antibiotic-associated colitis</li>
+                  </ul>
 
-                <div style='background-color: #f0f8ff; padding: 10px; border-radius: 5px; margin-top: 15px;'>
-                  <p style='margin: 0; font-size: 13px;'><strong>Note:</strong> These five infection types represent the most common and clinically significant HAIs monitored in European healthcare settings.</p>
-                </div>
-              </div>"
+                  <div style='background-color: #f0f8ff; padding: 10px; border-radius: 5px; margin-top: 15px;'>
+                    <p style='margin: 0; font-size: 13px;'><strong>Note:</strong> These five infection types represent the most common and clinically significant HAIs monitored in European healthcare settings.</p>
+                  </div>
+                </div>"
+              )
             )
           )
-        ),
-
-        # Row 3: Treemap visualization ----
-        fluidRow(
-          box(
-            title = "Survey Sample Distribution: HAI Prevalence by Country and Infection Type",
-            status = "primary",
-            solidHeader = TRUE,
-            width = 12,
-            HTML("<p style='margin-bottom: 15px; color: #666;'>
-                  This hierarchical visualization shows the distribution of surveyed patients by country,
-                  HAI status, and specific infection types. Larger rectangles represent higher patient counts.
-                  </p>"),
-            plotlyOutput("treemap_plot", height = "600px")
-          )
-        ),
+        )
       ),
 
       # TAB 2: Population Estimates ----
@@ -265,15 +271,7 @@ dashboardPage(
                   icon = icon("dot-circle"),
                   value = "bubble",
 
-                  br(),
-
-                  # Center the plot with better sizing
-                  div(
-                    style = "display: flex; justify-content: center; align-items: center;",
-                    plotlyOutput("bubble_plot", height = "550px", width = "100%")
-                  ),
-
-                  # Interpretation guide below plot
+                  # Interpretation guide
                   hr(style = "margin: 20px 0;"),
                   HTML("
                     <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 13px;'>
@@ -285,81 +283,250 @@ dashboardPage(
                         <li><strong>Hover for details:</strong> Move your cursor over bubbles to see exact numbers and calculated CFR</li>
                       </ul>
                     </div>
-                  ")
+                  "),
+
+                  # Center the plot with better sizing
+                  div(
+                    style = "display: flex; justify-content: center; align-items: center;",
+                    plotlyOutput("bubble_plot", height = "550px", width = "100%")
+                  )
                 )
               )
             )
           )
         )
-        ),
+      ),
 
+      # TAB 3: Stratified Analysis ----
       tabItem(
         tabName = "stratified",
 
-        # Page Header
-        h2("Stratified Demographic Analysis"),
-        p("This tab shows how HAI burden varies by age and sex."),
-
-        # Minimal Control Panel
+        # Page Header with detailed description ----
         fluidRow(
-          box(
-            title = "Analysis Controls",
-            status = "primary",
-            solidHeader = TRUE,
-            width = 12,
-            column(
-              width = 6,
+          column(12,
+                 h2("Stratified Demographic Analysis", style = "margin-top: 0;"),
+                 p(style = "font-size: 15px; color: #666; margin-bottom: 20px;",
+                   "Explore how HAI burden varies across age groups and biological sex. ",
+                   "The diverging bar chart displays female burden on the left and male burden on the right, ",
+                   "enabling direct comparison of demographic patterns. Error bars represent 95% confidence intervals."
+                 )
+          )
+        ),
+
+        # Main Content Row: Filters (Left) + Visualization (Right) ----
+        fluidRow(
+          # Left Column: Control Panel + Guide Boxes (3 columns) ----
+          column(
+            width = 3,
+
+            # Control Panel Box ----
+            box(
+              title = "Analysis Controls",
+              status = "primary",
+              solidHeader = TRUE,
+              width = NULL,
+
+              # Country Selection ----
               selectInput(
                 inputId = "country_stratified",
-                label = "Select Country/Region:",
+                label = "Country/Region:",
                 choices = c("Germany", "European Union"),
                 selected = "Germany"
-              )
-            ),
-            column(
-              width = 6,
+              ),
+              helpText(style = "font-size: 12px; margin-top: -10px;",
+                       "Geographic region for analysis"),
+
+              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+
+              # Metric Selection ----
               radioButtons(
                 inputId = "stratified_metric",
                 label = "Metric to Display:",
-                choices = c("Cases" = "ncases", "Deaths" = "ndeath", "DALYs" = "ndaly"),
+                choices = c(
+                  "Cases" = "ncases",
+                  "Deaths" = "ndeath",
+                  "DALYs" = "ndaly"
+                ),
                 selected = "ncases"
-              )
-            ),
-            column(
-              width = 3,
+              ),
+              helpText(style = "font-size: 12px; margin-top: -10px;",
+                       "Burden metric to visualize"),
+
+              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+
+              # Infection Selection ----
               checkboxGroupInput(
                 inputId = "infections_stratified",
-                label = "Select Infections to Display:",
+                label = "Select Infections:",
                 choices = unique(bhai_strata_summary$infection),
                 selected = unique(bhai_strata_summary$infection)
               ),
-            ),
+              helpText(
+                style = "font-size: 12px; color: #f39c12; font-weight: 500; margin-top: -10px;",
+                "⚠ Tip: Select 1-3 for best readability"
+              ),
 
-            column(
-              width = 3,
+              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+
+              # Age Group Filter ----
               selectInput(
                 inputId = "age_group_filter_strat",
                 label = "Age Group Filter:",
                 choices = unique(bhai_strata_summary$age_group),
                 selected = unique(bhai_strata_summary$age_group),
-                multiple = TRUE
-              )
-            )
-          )
-        ),
+                multiple = TRUE,
+                selectize = TRUE
+              ),
+              helpText(style = "font-size: 12px; margin-top: -10px;",
+                       "Filter specific age groups or select all"),
 
-        # Diverging Bar Chart
-        fluidRow(
-          box(
-            title = "Burden Distribution by Age and Sex",
-            status = "primary",
-            solidHeader = TRUE,
-            width = 12,
-            plotly::plotlyOutput("stratified_diverging_plot", height = "1500px")
+              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+
+              # Quick Stats Summary ----
+              HTML("
+                <div style='background-color: #e8f4f8; padding: 10px; border-radius: 5px; margin-top: 10px;'>
+                  <p style='margin: 0; font-size: 12px; font-weight: 600; color: #2c3e50;'>
+                    <i class='fa fa-info-circle'></i> Quick Guide:
+                  </p>
+                  <ul style='font-size: 11px; margin: 8px 0 0 18px; line-height: 1.5; color: #34495e;'>
+                    <li>Compare F (left) vs M (right)</li>
+                    <li>Longer bars = higher burden</li>
+                    <li>Error bars show uncertainty</li>
+                    <li>Hover for exact values</li>
+                  </ul>
+                </div>
+              ")
+            ),
+
+            # Interpretation Guide Box ----
+            box(
+              title = "Understanding Results",
+              status = "info",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed = TRUE,
+              width = NULL,
+              HTML("
+                <div style='font-size: 12px; line-height: 1.5;'>
+                  <h4 style='margin-top: 0; font-size: 14px;'>Key Insights:</h4>
+                  <ul style='margin-left: 15px;'>
+                    <li><strong>Age Patterns:</strong> Elderly populations (65+) often show highest burden.</li>
+                    <li><strong>Sex Differences:</strong> Compare left (F) vs right (M) for asymmetries.</li>
+                    <li><strong>Uncertainty:</strong> Wider error bars = greater uncertainty in estimates.</li>
+                    <li><strong>Prevention Focus:</strong> Target high-burden age-sex groups.</li>
+                  </ul>
+
+                  <h4 style='margin-top: 12px; font-size: 14px;'>Clinical Use:</h4>
+                  <ul style='margin-left: 15px;'>
+                    <li>Tailor prevention programs to vulnerable demographics</li>
+                    <li>Allocate resources based on burden distribution</li>
+                    <li>Enhance surveillance in high-uncertainty groups</li>
+                  </ul>
+
+                  <div style='background-color: #fff3cd; padding: 8px; border-left: 3px solid #f39c12; margin-top: 10px;'>
+                    <p style='margin: 0; font-size: 11px;'><strong>Note:</strong> Estimates from 500 BHAI simulations.
+                    CIs reflect statistical uncertainty.</p>
+                  </div>
+                </div>
+              ")
+            ),
+
+            # Field Definitions Box ----
+            box(
+              title = "Glossary",
+              status = "warning",
+              solidHeader = TRUE,
+              collapsible = TRUE,
+              collapsed = TRUE,
+              width = NULL,
+              HTML("
+                <div style='font-size: 11px; line-height: 1.5;'>
+                  <dl style='margin-left: 5px;'>
+                    <dt style='font-weight: bold; margin-top: 6px; font-size: 12px;'>Stratification</dt>
+                    <dd style='margin-left: 15px; margin-bottom: 6px;'>
+                      Dividing population into subgroups by age, sex, or other characteristics.
+                    </dd>
+
+                    <dt style='font-weight: bold; margin-top: 6px; font-size: 12px;'>Age Groups</dt>
+                    <dd style='margin-left: 15px; margin-bottom: 6px;'>
+                      Categories from newborns (0-1) to elderly (85-120 years).
+                    </dd>
+
+                    <dt style='font-weight: bold; margin-top: 6px; font-size: 12px;'>Sex</dt>
+                    <dd style='margin-left: 15px; margin-bottom: 6px;'>
+                      Biological sex: Male (M) or Female (F).
+                    </dd>
+
+                    <dt style='font-weight: bold; margin-top: 6px; font-size: 12px;'>Stratum</dt>
+                    <dd style='margin-left: 15px; margin-bottom: 6px;'>
+                      Specific demographic subgroup (e.g., \"Female, 65-84, BSI\").
+                    </dd>
+
+                    <dt style='font-weight: bold; margin-top: 6px; font-size: 12px;'>Point Estimate</dt>
+                    <dd style='margin-left: 15px; margin-bottom: 6px;'>
+                      Most likely value (median of 500 simulations).
+                    </dd>
+
+                    <dt style='font-weight: bold; margin-top: 6px; font-size: 12px;'>95% CI</dt>
+                    <dd style='margin-left: 15px; margin-bottom: 6px;'>
+                      Range containing true value with 95% probability.
+                    </dd>
+
+                    <dt style='font-weight: bold; margin-top: 6px; font-size: 12px;'>Error Bars</dt>
+                    <dd style='margin-left: 15px; margin-bottom: 6px;'>
+                      Black horizontal lines showing confidence intervals.
+                    </dd>
+
+                    <dt style='font-weight: bold; margin-top: 6px; font-size: 12px;'>Faceting</dt>
+                    <dd style='margin-left: 15px; margin-bottom: 6px;'>
+                      Splitting chart into panels (here: by sex).
+                    </dd>
+                  </dl>
+
+                  <div style='background-color: #d1ecf1; padding: 8px; border-left: 3px solid #17a2b8; margin-top: 10px;'>
+                    <p style='margin: 0; font-size: 11px;'><strong>Tip:</strong> Focus on relative patterns,
+                    as panels use independent scales.</p>
+                  </div>
+                </div>
+              ")
+            )
+          ),
+
+          # Right Column: Visualization (9 columns) ----
+          column(
+            width = 9,
+            box(
+              title = "Burden Distribution by Age and Sex",
+              status = "primary",
+              solidHeader = TRUE,
+              width = NULL,
+
+              # Chart description and reading guide ----
+              HTML("
+                <div style='background-color: #f8f9fa; padding: 12px; border-radius: 5px; margin-bottom: 15px; font-size: 14px;'>
+                  <strong>How to Read This Chart:</strong>
+                  <ul style='margin: 8px 0 5px 20px; line-height: 1.6;'>
+                    <li><strong>Left Panel (F):</strong> Female burden - bars extend right from age groups</li>
+                    <li><strong>Right Panel (M):</strong> Male burden - bars extend right from age groups</li>
+                    <li><strong>Bar Length:</strong> Longer bars indicate higher burden in that age-sex group</li>
+                    <li><strong>Colors:</strong> Each color represents a different infection type (HAP, SSI, BSI, UTI, CDI)</li>
+                    <li><strong>Error Bars:</strong> Black horizontal lines show 95% confidence intervals around estimates</li>
+                    <li><strong>Grouped Bars:</strong> Multiple infections appear side-by-side within each age group for comparison</li>
+                    <li><strong>Hover:</strong> Move cursor over bars to see exact values, confidence intervals, and infection details</li>
+                  </ul>
+                  <p style='margin: 8px 0 0 0; font-size: 13px; color: #666;'>
+                    <em>Note: Charts use independent X-axis scales for each sex to maximize visualization clarity.
+                    Focus on relative patterns and proportions rather than absolute scale comparisons between female and male panels.</em>
+                  </p>
+                </div>
+              "),
+
+              # The actual plot output ----
+              plotly::plotlyOutput("stratified_diverging_plot", height = "1200px")
+            )
           )
         )
       )
-
     )
   )
 )
