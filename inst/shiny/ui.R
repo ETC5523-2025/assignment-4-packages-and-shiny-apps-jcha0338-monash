@@ -1,57 +1,53 @@
-library(shiny)
-library(shinydashboard)
-library(plotly)
-
-dashboardPage(
+shinydashboard::dashboardPage(
   skin = "blue",
 
-  dashboardHeader(
+  shinydashboard::dashboardHeader(
     title = "healthburdenr",
     titleWidth = 250
   ),
 
-  dashboardSidebar(
+  shinydashboard::dashboardSidebar(
     width = 250,
-    sidebarMenu(
+    shinydashboard::sidebarMenu(
       id = "tabs",
-      menuItem("Overview", tabName = "overview", icon = icon("info-circle")),
-      menuItem("Population Estimates", tabName = "estimates", icon = icon("project-diagram")),
-      menuItem("Stratified Analysis", tabName = "stratified", icon = icon("chart-bar"))
+      shinydashboard::menuItem("Overview", tabName = "overview", icon = icon("info-circle")),
+      shinydashboard::menuItem("Population Estimates", tabName = "estimates", icon = icon("project-diagram")),
+      shinydashboard::menuItem("Stratified Analysis", tabName = "stratified", icon = icon("chart-bar"))
     )
   ),
 
-  dashboardBody(
-    tags$head(
-      tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+  shinydashboard::dashboardBody(
+    shiny::tags$head(
+      shiny::tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
     ),
 
-    tabItems(
+    shinydashboard::tabItems(
       # TAB 1: Overview ----
-      tabItem(
+      shinydashboard::tabItem(
         tabName = "overview",
 
         # Row 1: Value boxes ----
-        fluidRow(
-          valueBoxOutput("value_box_total_patients", width = 4),
-          valueBoxOutput("value_box_total_hai", width = 4),
-          valueBoxOutput("value_box_infections", width = 4)
+        shiny::fluidRow(
+          shinydashboard::valueBoxOutput("value_box_total_patients", width = 4),
+          shinydashboard::valueBoxOutput("value_box_total_hai", width = 4),
+          shinydashboard::valueBoxOutput("value_box_infections", width = 4)
         ),
 
         # Row 2 & 3 merged: Info boxes on left, treemap on right ----
-        fluidRow(
+        shiny::fluidRow(
 
           # LEFT COLUMN: two info panels stacked
-          column(
+          shiny::column(
             width = 3,
 
-            box(
+            shinydashboard::box(
               title = "About BHAI & Healthcare-Associated Infections",
               status = "primary",
               solidHeader = TRUE,
               collapsible = TRUE,
               collapsed = FALSE,
               width = 12,
-              HTML(
+              shiny::HTML(
                 "<div style='font-size: 14px; line-height: 1.6;'>
                   <p><strong>Healthcare-Associated Infections (HAIs)</strong> are infections that patients acquire during healthcare delivery in hospitals or other healthcare facilities.
                   These infections were not present or incubating at the time of admission and pose significant challenges to patient safety and healthcare quality.</p>
@@ -86,27 +82,27 @@ dashboardPage(
           ),
 
           # RIGHT COLUMN: treemap ----
-          column(
+          shiny::column(
             width = 9,
-            box(
+            shinydashboard::box(
               title = "Survey Sample Distribution: HAI Prevalence by Country and Infection Type",
               status = "primary",
               solidHeader = TRUE,
               width = 12,
-              HTML("<p style='margin-bottom: 15px; color: #666;'>
+              shiny::HTML("<p style='margin-bottom: 15px; color: #666;'>
                     This hierarchical visualization shows the distribution of surveyed patients by country,
                     HAI status, and specific infection types. Larger rectangles represent higher patient counts.
                   </p>"),
-              plotlyOutput("treemap_plot", height = "600px")
+              plotly::plotlyOutput("treemap_plot", height = "600px")
             ),
-            box(
+            shinydashboard::box(
               title = "Understanding the Data Fields",
               status = "info",
               solidHeader = TRUE,
               collapsible = TRUE,
               collapsed = FALSE,
               width = 12,
-              HTML(
+              shiny::HTML(
                 "<div style='font-size: 14px; line-height: 1.6;'>
                   <dl style='margin-left: 10px;'>
                     <dt style='font-weight: bold; margin-top: 10px;'>HAI (Healthcare-Associated Infection)</dt>
@@ -144,14 +140,14 @@ dashboardPage(
       ),
 
       # TAB 2: Population Estimates ----
-      tabItem(
+      shinydashboard::tabItem(
         tabName = "estimates",
 
         # Header with better description
-        fluidRow(
-          column(12,
-                 h2("Population Burden Estimates", style = "margin-top: 0;"),
-                 p(style = "font-size: 15px; color: #666; margin-bottom: 20px;",
+        shiny::fluidRow(
+          shiny::column(12,
+                 shiny::h2("Population Burden Estimates", style = "margin-top: 0;"),
+                 shiny::p(style = "font-size: 15px; color: #666; margin-bottom: 20px;",
                    "Annual burden estimates derived from BHAI modeling, showing cases, deaths, and disability-adjusted life years (DALYs) by infection type. ",
                    "The 'ALL' row represents the aggregate burden across all five HAI types."
                  )
@@ -159,49 +155,49 @@ dashboardPage(
         ),
 
         # Summary Value Boxes (using ALL row)
-        fluidRow(
-          valueBoxOutput("vbox_total_cases", width = 3),
-          valueBoxOutput("vbox_total_deaths", width = 3),
-          valueBoxOutput("vbox_overall_cfr", width = 3),
-          valueBoxOutput("vbox_total_dalys", width = 3)
+        shiny::fluidRow(
+          shinydashboard::valueBoxOutput("vbox_total_cases", width = 3),
+          shinydashboard::valueBoxOutput("vbox_total_deaths", width = 3),
+          shinydashboard::valueBoxOutput("vbox_overall_cfr", width = 3),
+          shinydashboard::valueBoxOutput("vbox_total_dalys", width = 3)
         ),
 
         # Main content: Filter + Tabbed outputs
-        fluidRow(
+        shiny::fluidRow(
           # Filter Box
-          column(
+          shiny::column(
             width = 3,
-            box(
+            shinydashboard::box(
               title = "Filters",
               status = "primary",
               solidHeader = TRUE,
               width = NULL,
 
-              selectInput(
+              shiny::selectInput(
                 "country_estimate",
                 "Select Country/Region:",
                 choices = c("Germany", "European Union"),
                 selected = "Germany"
               ),
 
-              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+              shiny::hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
 
-              HTML("<p style='font-size: 13px; color: #666; margin-bottom: 5px;'><strong>Data Notes:</strong></p>"),
-              HTML("<ul style='font-size: 12px; color: #666; margin-left: 15px; line-height: 1.5;'>
+              shiny::HTML("<p style='font-size: 13px; color: #666; margin-bottom: 5px;'><strong>Data Notes:</strong></p>"),
+              shiny::HTML("<ul style='font-size: 12px; color: #666; margin-left: 15px; line-height: 1.5;'>
                 <li>Values are point estimates with 95% confidence intervals</li>
                 <li>'ALL' row shows total burden across all HAI types</li>
                 <li>CFR = Case-Fatality Rate (%)</li>
               </ul>")
             ),
 
-            box(
+            shinydashboard::box(
               title = "Understanding Burden Metrics",
               status = "warning",
               solidHeader = TRUE,
               collapsible = TRUE,
               collapsed = FALSE,
               width = NULL,
-              HTML("
+              shiny::HTML("
               <div style='font-size: 14px; line-height: 1.6;'>
                 <dl style='margin-left: 10px;'>
                   <dt style='font-weight: bold; margin-top: 10px;'>Point Estimate</dt>
@@ -237,26 +233,26 @@ dashboardPage(
           ),
 
           # Tabbed Outputs (right main panel)
-          column(
+          shiny::column(
             width = 9,
-            box(
+            shinydashboard::box(
               title = NULL,
               status = "primary",
               solidHeader = FALSE,
               width = NULL,
 
-              tabsetPanel(
+              shiny::tabsetPanel(
                 id = "estimates_tabs",
                 type = "tabs",
 
                 # Tab 1: Data Table
-                tabPanel(
+                shiny::tabPanel(
                   title = "Data Table",
                   icon = icon("table"),
                   value = "table",
 
-                  br(),
-                  HTML("<p style='margin-bottom: 15px; color: #666;'>
+                  shiny::br(),
+                  shiny::HTML("<p style='margin-bottom: 15px; color: #666;'>
                     Detailed estimates for all infections. The 'ALL' row is highlighted in gray.
                     CFR (Case-Fatality Rate) is color-coded: <span style='background: #d4edda; padding: 2px 6px;'>&lt;3%</span>,
                     <span style='background: #fff3cd; padding: 2px 6px;'>3-10%</span>,
@@ -266,14 +262,14 @@ dashboardPage(
                 ),
 
                 # Tab 2: Bubble Plot
-                tabPanel(
+                shiny::tabPanel(
                   title = "Bubble Chart",
                   icon = icon("dot-circle"),
                   value = "bubble",
 
                   # Interpretation guide
-                  hr(style = "margin: 20px 0;"),
-                  HTML("
+                  shiny::hr(style = "margin: 20px 0;"),
+                  shiny::HTML("
                     <div style='background-color: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 13px;'>
                       <strong>Interpretation Tips:</strong>
                       <ul style='margin: 10px 0 5px 20px; line-height: 1.6;'>
@@ -286,9 +282,9 @@ dashboardPage(
                   "),
 
                   # Center the plot with better sizing
-                  div(
+                  shiny::div(
                     style = "display: flex; justify-content: center; align-items: center;",
-                    plotlyOutput("bubble_plot", height = "550px", width = "100%")
+                    plotly::plotlyOutput("bubble_plot", height = "550px", width = "100%")
                   )
                 )
               )
@@ -298,14 +294,14 @@ dashboardPage(
       ),
 
       # TAB 3: Stratified Analysis ----
-      tabItem(
+      shinydashboard::tabItem(
         tabName = "stratified",
 
         # Page Header with detailed description ----
-        fluidRow(
-          column(12,
-                 h2("Stratified Demographic Analysis", style = "margin-top: 0;"),
-                 p(style = "font-size: 15px; color: #666; margin-bottom: 20px;",
+        shiny::fluidRow(
+          shiny::column(12,
+                 shiny::h2("Stratified Demographic Analysis", style = "margin-top: 0;"),
+                 shiny::p(style = "font-size: 15px; color: #666; margin-bottom: 20px;",
                    "Explore how HAI burden varies across age groups and biological sex. ",
                    "The diverging bar chart displays female burden on the left and male burden on the right, ",
                    "enabling direct comparison of demographic patterns. Error bars represent 95% confidence intervals."
@@ -314,32 +310,32 @@ dashboardPage(
         ),
 
         # Main Content Row: Filters (Left) + Visualization (Right) ----
-        fluidRow(
+        shiny::fluidRow(
           # Left Column: Control Panel + Guide Boxes (3 columns) ----
-          column(
+          shiny::column(
             width = 3,
 
             # Control Panel Box ----
-            box(
+            shinydashboard::box(
               title = "Analysis Controls",
               status = "primary",
               solidHeader = TRUE,
               width = NULL,
 
               # Country Selection ----
-              selectInput(
+              shiny::selectInput(
                 inputId = "country_stratified",
                 label = "Country/Region:",
                 choices = c("Germany", "European Union"),
                 selected = "Germany"
               ),
-              helpText(style = "font-size: 12px; margin-top: -10px;",
+              shiny::helpText(style = "font-size: 12px; margin-top: -10px;",
                        "Geographic region for analysis"),
 
-              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+              shiny::hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
 
               # Metric Selection ----
-              radioButtons(
+              shiny::radioButtons(
                 inputId = "stratified_metric",
                 label = "Metric to Display:",
                 choices = c(
@@ -349,27 +345,27 @@ dashboardPage(
                 ),
                 selected = "ncases"
               ),
-              helpText(style = "font-size: 12px; margin-top: -10px;",
+              shiny::helpText(style = "font-size: 12px; margin-top: -10px;",
                        "Burden metric to visualize"),
 
-              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+              shiny::hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
 
               # Infection Selection ----
-              checkboxGroupInput(
+              shiny::checkboxGroupInput(
                 inputId = "infections_stratified",
                 label = "Select Infections:",
                 choices = unique(bhai_strata_summary$infection),
                 selected = unique(bhai_strata_summary$infection)
               ),
-              helpText(
+              shiny::helpText(
                 style = "font-size: 12px; color: #f39c12; font-weight: 500; margin-top: -10px;",
                 "⚠ Tip: Select 1-3 for best readability"
               ),
 
-              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+              shiny::hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
 
               # Age Group Filter ----
-              selectInput(
+              shiny::selectInput(
                 inputId = "age_group_filter_strat",
                 label = "Age Group Filter:",
                 choices = unique(bhai_strata_summary$age_group),
@@ -377,13 +373,13 @@ dashboardPage(
                 multiple = TRUE,
                 selectize = TRUE
               ),
-              helpText(style = "font-size: 12px; margin-top: -10px;",
+              shiny::helpText(style = "font-size: 12px; margin-top: -10px;",
                        "Filter specific age groups or select all"),
 
-              hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
+              shiny::hr(style = "margin: 15px 0; border-top: 1px solid #ddd;"),
 
               # Quick Stats Summary ----
-              HTML("
+              shiny::HTML("
                 <div style='background-color: #e8f4f8; padding: 10px; border-radius: 5px; margin-top: 10px;'>
                   <p style='margin: 0; font-size: 12px; font-weight: 600; color: #2c3e50;'>
                     <i class='fa fa-info-circle'></i> Quick Guide:
@@ -399,14 +395,14 @@ dashboardPage(
             ),
 
             # Interpretation Guide Box ----
-            box(
+            shinydashboard::box(
               title = "Understanding Results",
               status = "info",
               solidHeader = TRUE,
               collapsible = TRUE,
               collapsed = TRUE,
               width = NULL,
-              HTML("
+              shiny::HTML("
                 <div style='font-size: 12px; line-height: 1.5;'>
                   <h4 style='margin-top: 0; font-size: 14px;'>Key Insights:</h4>
                   <ul style='margin-left: 15px;'>
@@ -432,14 +428,14 @@ dashboardPage(
             ),
 
             # Field Definitions Box ----
-            box(
+            shinydashboard::box(
               title = "Glossary",
               status = "warning",
               solidHeader = TRUE,
               collapsible = TRUE,
               collapsed = TRUE,
               width = NULL,
-              HTML("
+              shiny::HTML("
                 <div style='font-size: 11px; line-height: 1.5;'>
                   <dl style='margin-left: 5px;'>
                     <dt style='font-weight: bold; margin-top: 6px; font-size: 12px;'>Stratification</dt>
@@ -493,16 +489,16 @@ dashboardPage(
           ),
 
           # Right Column: Visualization (9 columns) ----
-          column(
+          shiny::column(
             width = 9,
-            box(
+            shinydashboard::box(
               title = "Burden Distribution by Age and Sex",
               status = "primary",
               solidHeader = TRUE,
               width = NULL,
 
               # Chart description and reading guide ----
-              HTML("
+              shiny::HTML("
                 <div style='background-color: #f8f9fa; padding: 12px; border-radius: 5px; margin-bottom: 15px; font-size: 14px;'>
                   <strong>How to Read This Chart:</strong>
                   <ul style='margin: 8px 0 5px 20px; line-height: 1.6;'>
