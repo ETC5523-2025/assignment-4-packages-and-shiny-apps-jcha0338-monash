@@ -1,0 +1,474 @@
+---
+title: "Dashboard User Guide"
+author: "Your Name"
+date: "3 November 2025"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Dashboard User Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+## Introduction
+
+The `healthburdenr` interactive dashboard provides a comprehensive interface for exploring healthcare-associated infection (HAI) burden data. This guide walks you through each feature of the dashboard and explains how to interpret the visualizations.
+
+## Launching the Dashboard
+
+Load the package and launch the dashboard:
+```{r launch, eval=FALSE}
+library(healthburdenr)
+
+# Launch with default settings
+run_app()
+
+# Launch on specific port (if default is already in use)
+run_app(port = 3838)
+
+# Launch without auto-opening browser
+run_app(launch.browser = FALSE)
+```
+
+The dashboard will open in your default web browser. If it doesn't open automatically, look for a message in the R console showing the local URL (typically `http://127.0.0.1:####`).
+
+## Dashboard Overview
+
+The dashboard consists of three main tabs accessible from the left sidebar:
+
+1. **Overview** - Survey sample distribution and HAI prevalence
+2. **Population Estimates** - Annual burden estimates with visualizations
+3. **Stratified Analysis** - Demographic breakdowns by age and sex
+
+Each tab is self-contained with its own controls, visualizations, and interpretation guides.
+
+---
+
+## Tab 1: Overview
+
+### Purpose
+
+The Overview tab presents survey sample distribution data from Point Prevalence Surveys (PPS), showing:
+
+- How many patients were surveyed in each region
+- How many patients had healthcare-associated infections
+- The distribution of specific infection types
+
+### Key Features
+
+#### Value Boxes
+
+Three summary statistics provide a quick overview:
+
+- **Total Survey Patients**: Combined total across Germany and EU
+- **Total HAI Patients**: Total patients with at least one HAI
+- **Infection Types Tracked**: Number of infection categories (5: HAP, SSI, BSI, UTI, CDI)
+
+These boxes give you an at-a-glance understanding of the survey scale.
+
+#### Information Boxes
+
+Two collapsible boxes provide essential background:
+
+- **About BHAI & Healthcare-Associated Infections**: Explains methodology and burden metrics
+- **Understanding the Data Fields**: Definitions of key terms and infection types
+
+Expand these if you're new to HAI surveillance or need clarification on terminology.
+
+#### Interactive Treemap Visualization
+
+The main feature of this tab is a hierarchical treemap showing:
+
+**Structure:**
+- **Top level**: Countries (Germany, European Union)
+- **Second level**: HAI status (patients with HAI vs. unaffected)
+- **Bottom level**: Specific infection types (HAP, SSI, BSI, UTI, CDI)
+
+**How to interact:**
+- **Hover**: Move your mouse over any rectangle to see exact numbers and percentages
+- **Click**: Click on rectangles to zoom in and explore that segment
+- **Breadcrumb**: Use the breadcrumb trail at the top to navigate back
+
+**Color coding:**
+- Blue shades: Unaffected patients
+- Red/warm tones: Patients with HAI
+- Distinct colors: Each infection type
+
+**What to look for:**
+- **Relative sizes**: Larger boxes = more patients
+- **Prevalence**: Compare "HAI" vs. "Unaffected" sections to see overall infection rates
+- **Common infections**: Identify which infections affect the most patients
+- **Country differences**: Compare patterns between Germany and EU
+
+### Interpretation Tips
+
+1. **Prevalence patterns**: If the "HAI" section is much smaller than "Unaffected," prevalence is low (which is good)
+
+2. **Infection distribution**: Within the HAI section, the largest rectangles show which infections are most commonly found
+
+3. **Geographic variation**: Differences between Germany and EU may reflect:
+   - Different healthcare systems
+   - Different patient populations
+   - Survey methodology variations
+
+4. **Clinical implications**: Common infections (large boxes) may need widespread prevention efforts, while less common infections might require targeted approaches
+
+---
+
+## Tab 2: Population Estimates
+
+### Purpose
+
+This tab presents annual burden estimates derived from BHAI modeling, showing:
+
+- Total cases, deaths, and DALYs by infection type
+- Confidence intervals reflecting statistical uncertainty
+- Interactive visualizations for exploring relationships
+
+### Key Features
+
+#### Summary Value Boxes
+
+Four boxes display aggregate burden from the "ALL" row (sum across all infections):
+
+- **Total HAI Cases**: Annual infection episodes with 95% CI
+- **Total HAI Deaths**: Annual mortality with 95% CI
+- **Overall Case-Fatality Rate**: Percentage of cases resulting in death
+- **Total DALYs**: Combined burden of mortality and morbidity with 95% CI
+
+These provide a high-level view of total HAI impact in the selected country.
+
+#### Control Panel
+
+**Country/Region Filter:**
+- Select "Germany" or "European Union"
+- All outputs update immediately when changed
+
+**Data Notes:**
+- Quick reference for understanding value displays
+- Reminds you about confidence intervals and the "ALL" row
+
+#### Tabbed Outputs
+
+The main panel has two tabs:
+
+**Tab 2a: Data Table**
+
+A comprehensive table showing all burden metrics:
+
+**Features:**
+- Sortable columns (click headers)
+- Searchable (use search box)
+- Download buttons (Copy or CSV)
+- Color-coded CFR (Case-Fatality Rate):
+  - Green (<3%): Lower mortality
+  - Yellow (3-10%): Moderate mortality
+  - Red (>10%): Higher mortality
+- Gray highlighting for "ALL" row (aggregate)
+
+**Columns:**
+- HAI: Infection type
+- Cases: Point estimate with 95% CI
+- Deaths: Point estimate with 95% CI
+- CFR (%): Case-fatality rate
+- DALYs, YLL, YLD: Population health loss metrics with CIs
+
+**How to use:**
+1. Sort by deaths to identify deadliest infections
+2. Sort by cases to identify most common infections
+3. Compare CIs to understand uncertainty
+4. Download data for external analysis or reporting
+
+**Tab 2b: Bubble Chart**
+
+An interactive scatter plot showing relationships between burden metrics:
+
+**Axes:**
+- **X-axis**: Number of cases (annual incidence)
+- **Y-axis**: Number of deaths (annual mortality)
+- **Bubble size**: DALY burden (larger = more population health loss)
+- **Color**: Infection type (consistent with Overview tab)
+
+**How to interact:**
+- **Hover**: See exact values, including confidence intervals and CFR
+- **Zoom**: Use plotly toolbar to zoom and pan
+- **Download**: Save as PNG using camera icon in toolbar
+
+**What to look for:**
+
+1. **High burden infections**: Large bubbles in the top-right
+   - High incidence AND high mortality
+   - Priority for prevention efforts
+
+2. **High mortality rate**: Infections high on Y-axis relative to X-axis
+   - Fewer cases but more lethal
+   - May need specialized treatment protocols
+
+3. **High incidence**: Infections far to the right
+   - Many cases but lower mortality
+   - May still have high DALY burden due to volume
+
+4. **Overall burden**: Bubble size shows combined impact
+   - Large bubbles are high priority regardless of position
+   - Consider both frequency and severity
+
+**Example interpretation:**
+
+If BSI (Bloodstream Infection) appears as a large bubble in the top-right:
+- High number of cases 
+- High number of deaths
+- Large DALY burden
+- **Conclusion**: BSI is a high-priority infection requiring aggressive prevention and treatment strategies
+
+#### Interpretation Box
+
+A gray box provides tips for understanding the visualization:
+- Position interpretation
+- Bubble size meaning
+- Prevention priorities
+- How to use hover information
+
+### Best Practices for This Tab
+
+1. **Start with the table**: Get familiar with the numbers and ranges
+
+2. **Use the bubble chart for patterns**: Visual relationships are easier to see in the chart
+
+3. **Consider both metrics**: High incidence and high mortality both matter, but differently
+
+4. **Pay attention to CIs**: Wide confidence intervals mean more uncertainty
+
+5. **Compare countries**: Switch between Germany and EU to see differences
+
+6. **Export for reports**: Download the table for inclusion in presentations or papers
+
+---
+
+## Tab 3: Stratified Analysis
+
+### Purpose
+
+This tab breaks down burden by demographic characteristics:
+
+- Age groups
+- Biological sex (Male, Female)
+- Infection types
+
+This allows identification of vulnerable populations and targeting of prevention efforts.
+
+### Layout
+
+**Left Column:**
+- Control panel (filters)
+- Interpretation guide (collapsible)
+- Glossary (collapsible)
+
+**Right Column:**
+- Diverging bar chart visualization
+
+### Control Panel
+
+**Country/Region:**
+- Select Germany or European Union
+- Updates all outputs
+
+**Metric to Display:**
+- **Cases**: Number of infection episodes
+- **Deaths**: Number of deaths
+- **DALYs**: Disability-Adjusted Life Years
+
+**Select Infections:**
+- Check/uncheck infections to display
+- **Tip**: Select 1-3 infections for best readability
+- More than 3 can make the chart crowded
+
+**Age Group Filter:**
+- Select specific age groups or "All"
+- Use this to focus on particular age ranges
+- Multiple selection allowed
+
+### Diverging Bar Chart
+
+**Structure:**
+- **Left panel (F)**: Female burden, bars extend right
+- **Right panel (M)**: Male burden, bars extend right
+- **Y-axis**: Age groups (youngest at bottom, oldest at top)
+- **X-axis**: Burden metric (absolute scale shown)
+- **Colors**: Different color for each infection type
+- **Error bars**: Black horizontal lines showing 95% confidence intervals
+
+**How to read:**
+
+1. **Bar length**: Longer bars = higher burden in that age-sex group
+
+2. **Side-by-side comparison**: Direct visual comparison of male vs. female
+
+3. **Grouped bars**: When multiple infections selected, they appear side-by-side within each age group
+
+4. **Error bars**: Wider error bars = more uncertainty
+   - Common in very young (0-1) and very old (85+) groups due to smaller samples
+
+**What to look for:**
+
+1. **Age patterns**:
+   - Which age groups have the longest bars?
+   - Is burden concentrated in elderly (typical)?
+   - Are there unexpected patterns in younger groups?
+
+2. **Sex differences**:
+   - Are bars consistently longer on one side?
+   - Do patterns differ by infection type?
+   - Are sex differences larger in certain age groups?
+
+3. **Infection-specific patterns**:
+   - Do different infections show different age distributions?
+   - Which infections primarily affect elderly?
+   - Which infections are more evenly distributed?
+
+4. **Uncertainty**:
+   - Which groups have wide confidence intervals?
+   - Where is more data/surveillance needed?
+
+**Example interpretation:**
+
+If you see:
+- Very long bars for ages 65-84 and 85+
+- Slightly longer bars on the male side
+- Wide error bars for age 0-1
+
+**Conclusion**:
+- Elderly populations (65+) carry the highest burden (typical finding)
+- Males may have slightly higher burden than females (could be due to healthcare utilization or biological factors)
+- Infant data has high uncertainty (may need more surveillance in this group)
+
+### Interpretation Guide
+
+Located below the control panel, this box provides:
+- Key insights to look for
+- Clinical implications
+- Statistical notes
+- Tips for interpretation
+
+**Expand this** if you're unsure how to interpret patterns you see in the chart.
+
+### Glossary (Collapsible)
+
+Provides quick definitions of technical terms:
+- Stratification
+- Age groups
+- Stratum
+- Point estimates
+- Confidence intervals
+- Error bars
+- Faceting
+
+**Use this** as a reference when encountering unfamiliar terminology.
+
+---
+
+## General Dashboard Features
+
+### Navigation
+
+- **Sidebar menu**: Click tab names to switch between Overview, Population Estimates, and Stratified Analysis
+- **Active tab**: Highlighted in blue
+- **Collapsible boxes**: Click title bars to expand/collapse information boxes
+- **Breadcrumbs**: In treemap, use breadcrumb trail to navigate hierarchy
+
+### Interactivity
+
+All visualizations are interactive:
+
+- **Hover**: See detailed information
+- **Click**: Interact with elements (zoom in treemap, etc.)
+- **Zoom/Pan**: Use plotly toolbar on charts
+- **Download**: Export visualizations and data
+
+### Responsive Design
+
+The dashboard adapts to different screen sizes:
+- Desktop: Full layout with all features visible
+- Tablet: Stacked layout, scrollable
+- Mobile: Single column, optimized for touch
+
+### Performance Tips
+
+For the best experience:
+
+1. **Use modern browsers**: Chrome, Firefox, Safari, or Edge
+2. **Close unused tabs**: Reduces memory usage
+3. **Select fewer infections**: In stratified analysis, limit to 2-3 infections
+4. **Wait for rendering**: Large visualizations may take a moment to render
+
+---
+
+## Common Questions
+
+### Why do some estimates have wide confidence intervals?
+
+Wide confidence intervals occur when:
+
+- Sample sizes are small in specific strata (e.g., rare infections, young age groups)
+- Variability in the underlying data is high
+- The estimation model has inherent uncertainty
+
+This is normal and indicates areas where more surveillance data could improve precision.
+
+### What does the "`ALL`" row mean?
+The "`ALL`" row in the Population Estimates tab represents the sum of the five infection types (HAP, SSI, BSI, UTI, CDI). It's not a separate category, but rather the total HAI burden across all tracked infections.
+
+*Important:* The "`ALL`" row does NOT appear in stratified data, since stratification is done for individual infections.
+
+Can I export the data?
+
+Yes! Multiple export options:
+
+Data tables: Use "`Copy`" or "`CSV`" buttons
+
+Visualizations: Use the camera icon in the plotly toolbar to save as PNG
+
+## Best Practices for Dashboard Use
+
+### 1. Start Broad, Then Narrow
+
+- Begin with Overview for context
+- Move to Population Estimates for overall burden
+- Use Stratified Analysis to identify specific high-risk groups
+
+### 2. Always Consider Uncertainty
+
+- Look at confidence intervals, not just point estimates
+- Wide CIs = more caution needed in interpretation
+- Narrow CIs = more confidence in estimates
+
+### 3. Compare Appropriately
+
+- Use per capita rates when comparing countries
+- Consider demographic differences (age structure, healthcare systems)
+- Don't over-interpret small differences when CIs overlap
+
+### 4. Think Clinically and Practically
+
+- Statistical significance ≠ clinical importance
+- Consider magnitude: Is a difference large enough to matter?
+- Think about feasibility: Can identified groups be targeted effectively?
+
+### 5. Document Your Exploration
+
+- Take notes on patterns observed
+- Save visualizations as you go
+- Export data for verification and further analysis
+
+### 6. Verify Findings
+
+- Cross-check between tabs (e.g., prevalence vs. burden)
+- Look for consistency across metrics
+- Consider biological plausibility of patterns

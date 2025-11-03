@@ -1,0 +1,340 @@
+---
+title: "Introduction to healthburdenr"
+author: "Jay Ashok Chauhan"
+date: "3 November 2025"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to healthburdenr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+collapse = TRUE,
+comment = "#>",
+fig.width = 7,
+fig.height = 5,
+warning = FALSE,
+message = FALSE
+)
+```
+
+## Introduction
+
+The `healthburdenr` package provides tools for analyzing and visualizing the burden of healthcare-associated infections (HAIs) using data from German and European Union Point Prevalence Surveys (PPS). 
+
+### What are Healthcare-Associated Infections?
+
+Healthcare-Associated Infections (HAIs) are infections that patients acquire during the course of receiving healthcare treatment. These infections were not present or incubating at the time of admission and represent a significant public health challenge.
+
+### What is BHAI?
+
+BHAI (Burden of Healthcare-Associated Infections) is a systematic methodology developed to estimate the population-level burden of HAIs. It combines surveillance data from Point Prevalence Surveys with epidemiological modeling to quantify:
+
+- **Cases**: Annual number of infection episodes
+- **Deaths**: Mortality directly attributable to HAIs  
+- **DALYs**: Disability-Adjusted Life Years (overall population health loss)
+- **YLL**: Years of Life Lost due to premature mortality
+- **YLD**: Years Lived with Disability due to infection morbidity
+
+The methodology uses Monte Carlo simulation (500 runs) to provide point estimates with 95% confidence intervals, accounting for uncertainty in the underlying data.
+
+## Installation
+
+You can install `healthburdenr` from GitHub:
+
+```{r installation, eval=FALSE}
+# Install devtools if you haven't already
+install.packages("remotes")
+
+# Install healthburdenr
+remotes::install_github("yourusername/healthburdenr")
+```
+
+## Load the packages:
+```{r load-package}
+library(healthburdenr)
+library(dplyr)  # For data manipulation
+library(ggplot2)  # For additional visualizations
+```
+
+## Package Datasets
+
+The package includes three main datasets:
+
+### 1. Survey Sample Distribution
+
+Point prevalence survey data showing HAI prevalence across countries:
+
+```{r data-pps}
+data(bhai_pps_sample_distribution)
+
+# View structure
+glimpse(bhai_pps_sample_distribution)
+
+# View first few rows
+head(bhai_pps_sample_distribution)
+```
+
+**Key variables:**
+
+- `country`: Germany or European Union
+- `infection`: Type of HAI (HAP, SSI, BSI, UTI, CDI)
+- `num_hai_patients`: Number of patients with this infection in the survey
+- `num_survey_patients`: Total number of patients surveyed
+
+This dataset represents the **raw survey data** from point prevalence surveys - a snapshot of how many patients had infections on the survey day.
+
+### 2. Population Burden Estimates
+
+Annual burden estimates from BHAI modeling with confidence intervals:
+
+```{r data-pop}
+data(bhai_pop_est)
+
+# View structure
+glimpse(bhai_pop_est)
+
+# View summary
+head(bhai_pop_est)
+```
+
+**Key variables:**
+
+- `infection`: HAI type (plus "ALL" for aggregate across all infections)
+- `country`: Germany or European Union
+- `population`: Total population of the region
+- `cases_point_estimate`, `cases_lower_ci`, `cases_upper_ci`: Annual cases with 95% CI
+- `deaths_point_estimate`, `deaths_lower_ci`, `deaths_upper_ci`: Annual deaths with 95% CI
+- `daly_point_estimate`, `daly_lower_ci`, `daly_upper_ci`: DALYs with 95% CI
+- `yll_point_estimate`, `yll_lower_ci`, `yll_upper_ci`: Years of Life Lost with 95% CI
+- `yld_point_estimate`, `yld_lower_ci`, `yld_upper_ci`: Years Lived with Disability with 95% CI
+
+This dataset represents **annual burden estimates** extrapolated from the survey data using BHAI methodology.
+
+### 3. Stratified Results
+
+Demographic breakdown of burden by age groups and sex:
+
+```{r data-strata}
+data(bhai_strata_summary)
+
+# View structure
+glimpse(bhai_strata_summary)
+
+# View sample
+head(bhai_strata_summary)
+```
+
+**Key variables:**
+
+- `country`: Germany or European Union
+- `infection`: HAI type (HAP, SSI, BSI, UTI, CDI)
+- `sex`: Male or Female
+- `age_group`: Age categories
+- `ncases_estimate`, `ncases_lower_ci`, `ncases_upper_ci`: Cases in this demographic stratum
+- `ndeath_estimate`, `ndeath_lower_ci`, `ndeath_upper_ci`: Deaths in this stratum
+- `daly_estimate`, `daly_lower_ci`, `daly_upper_ci`: DALYs in this stratum
+
+This dataset allows **demographic analysis** to identify vulnerable populations.
+
+## Quick Start: The Interactive Dashboard
+
+The easiest way to explore the data is through the interactive Shiny dashboard:
+
+```{r run-app, eval=FALSE}
+run_app()
+```
+
+This launches a web-based dashboard with three main tabs:
+
+1. **Overview**: Survey sample distribution with interactive treemap showing HAI prevalence
+2. **Population Estimates**: Annual burden estimates with data tables and bubble charts
+3. **Stratified Analysis**: Demographic patterns by age and sex with diverging bar charts
+
+The dashboard provides:
+
+- Interactive filtering and exploration
+- Hover tooltips with detailed information
+- Downloadable data tables
+- Professional visualizations
+- Comprehensive interpretation guides
+
+## Basic Data Exploration
+
+### Survey Prevalence
+
+Calculate HAI prevalence rates:
+```{r prevalence}
+# Calculate prevalence by country and infection
+prevalence_summary <- bhai_pps_sample_distribution |>
+  mutate(
+    prevalence_pct = (num_hai_patients / num_survey_patients) * 100
+  ) |>
+  arrange(country, desc(prevalence_pct))
+
+print(prevalence_summary)
+```
+
+### Visualize Prevalence
+
+```{r prevalence-plot}
+library(ggplot2)
+
+ggplot(prevalence_summary, aes(x = infection, y = prevalence_pct, fill = country)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "HAI Prevalence by Infection Type and Country",
+    x = "Infection Type",
+    y = "Prevalence (%)",
+    fill = "Country"
+  ) +
+  theme_minimal()
+```
+
+### Population Burden
+
+Examine total burden by country:
+```{r burden-summary}
+# Filter for "ALL" row (total across infections)
+total_burden <- bhai_pop_est |>
+  filter(infection == "ALL") |>
+  select(country, cases_point_estimate, deaths_point_estimate, daly_point_estimate)
+
+print(total_burden)
+```
+
+Calculate case-fatality rates:
+```{r cfr}
+# CFR by infection
+cfr_by_infection <- bhai_pop_est |>
+  filter(infection != "ALL") |>
+  mutate(
+    cfr_pct = (deaths_point_estimate / cases_point_estimate) * 100
+  ) |>
+  select(country, infection, cases_point_estimate, deaths_point_estimate, cfr_pct) |>
+  arrange(country, desc(cfr_pct))
+
+print(cfr_by_infection)
+```
+
+### Stratified Analysis
+
+Identify highest-burden age groups:
+```{r age-burden}
+# Sum cases across infections by age group
+age_burden <- bhai_strata_summary |>
+  filter(country == "Germany") |>
+  group_by(age_group, sex) |>
+  summarise(
+    total_cases = sum(ncases_estimate),
+    total_deaths = sum(ndeath_estimate),
+    .groups = "drop"
+  ) |>
+  arrange(desc(total_cases))
+
+head(age_burden, 10)
+```
+
+Visualize sex differences:
+```{r sex-comparison}
+ggplot(age_burden, aes(x = age_group, y = total_cases, fill = sex)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(
+    title = "HAI Cases by Age Group and Sex (Germany)",
+    x = "Age Group",
+    y = "Total Cases",
+    fill = "Sex"
+  ) +
+  theme_minimal()
+```
+
+## Example Analyses
+
+### Example 1: Which infection has the highest mortality?
+```{r highest-mortality}
+bhai_pop_est |>
+  filter(infection != "ALL", country == "Germany") |>
+  arrange(desc(deaths_point_estimate)) |>
+  select(infection, deaths_point_estimate, deaths_lower_ci, deaths_upper_ci) |>
+  head(3)
+```
+
+### Example 2: Which age group is most vulnerable?
+```{r vulnerable-age}
+bhai_strata_summary |>
+  filter(country == "Germany") |>
+  group_by(age_group) |>
+  summarise(
+    total_daly = sum(daly_estimate),
+    .groups = "drop"
+  ) |>
+  arrange(desc(total_daly)) |>
+  head(5)
+```
+
+### Example 3: Compare burden per capita
+```{r per-capita}
+bhai_pop_est |>
+  filter(infection == "ALL") |>
+  mutate(
+    cases_per_100k = (cases_point_estimate / population) * 100000,
+    deaths_per_100k = (deaths_point_estimate / population) * 100000
+  ) |>
+  select(country, cases_per_100k, deaths_per_100k)
+```
+
+## Best Practices
+
+### 1. Always consider confidence intervals
+
+Don't focus solely on point estimates - confidence intervals provide crucial information about uncertainty.
+
+### 2. Compare rates, not absolute numbers
+
+When comparing countries, use per capita rates to account for population differences.
+
+### 3. Understand the "ALL" row
+
+The "ALL" row in `bhai_pop_est` is the **sum** of the five infection types, not a separate category.
+
+### 4. Be cautious with stratified data
+
+Estimates in small strata (e.g., very young or very old age groups) may have wide confidence intervals and should be interpreted carefully.
+
+### 5. Consider clinical context
+
+Statistical significance doesn't always mean clinical importance. Consider the magnitude of differences and their practical implications.
+
+## Next Steps
+
+Now that you understand the basics, explore further:
+
+1. **Launch the dashboard**: Use `run_app()` for interactive exploration with professional visualizations
+
+2. **Read the dashboard guide**: `vignette("dashboard-guide")` provides a detailed walkthrough of all dashboard features
+
+3. **Explore function documentation**: Use `?function_name` for detailed help:
+   - `?run_app` - Launch the dashboard
+   - `?flatten_pps` - Flatten PPS objects
+   - `?bhai_pop_est` - Population estimates dataset
+
+4. **Conduct custom analyses**: Use the datasets programmatically for your specific research questions
+
+5. **Export and share**: Download data and visualizations from the dashboard for reports and presentations
+
+## References
+
+- *BHAI R package*: Zacher B (2019). _BHAI: Estimate the Burden of Healthcare-Associated Infections_. R package version 0.99.2, <https://CRAN.R-project.org/package=BHAI>.
+
+For detailed methodology, see:
+
+Zacher B, Haller S, Eckmanns T, Noll I, Weiss B, Widders G, Gastmeier P, Monnet DL (2019). Application of a new methodology and R package reveals a high burden of healthcare-associated infections (HAI) in Germany compared to the average in the European Union/European Economic Area, 2011 to 2012. *Euro Surveill*. 24(46):pii=1900135. [https://doi.org/10.2807/1560-7917.ES.2019.24.46.1900135](https://doi.org/10.2807/1560-7917.ES.2019.24.46.1900135)
+
+## Getting Help
+
+- **Package documentation**: `?healthburdenr`
+- **Function help**: `?run_app`, `?flatten_pps`
+- **Dataset help**: `?bhai_pop_est`, `?bhai_strata_summary`
