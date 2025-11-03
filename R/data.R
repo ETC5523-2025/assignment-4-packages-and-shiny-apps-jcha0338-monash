@@ -13,8 +13,27 @@
 #'   \item{num_survey_patients}{Total number of patients surveyed}
 #' }
 #'
-#' @source Derived from BHAI package using German PPS 2011 and EU PPS data
-#' @seealso [bhai_strata_summary], [bhai_pop_est]
+#' @details
+#' The five infection types tracked are:
+#' \itemize{
+#'   \item \strong{HAP:} Hospital-acquired pneumonia
+#'   \item \strong{SSI:} Surgical site infection
+#'   \item \strong{BSI:} Bloodstream infection
+#'   \item \strong{UTI:} Urinary tract infection
+#'   \item \strong{CDI:} \emph{Clostridioides difficile} infection
+#' }
+#'
+#' @source Derived from BHAI package using German PPS 2011 and EU PPS data.
+#'   Zacher et al. (2019) \doi{10.2807/1560-7917.ES.2019.24.46.1900135}
+#'
+#' @references
+#' Zacher B, Haller S, Eckmanns T, Noll I, Weiss B, Widders G, Gastmeier P,
+#' Monnet DL. Application of a new methodology and R package reveals a high
+#' burden of healthcare-associated infections (HAI) in Germany compared to
+#' the average in the European Union/European Economic Area, 2011 to 2012.
+#' Euro Surveill. 2019;24(46):pii=1900135.
+#'
+#' @seealso [bhai_strata_summary], [bhai_pop_est], [flatten_pps()]
 #'
 #' @examples
 #' data(bhai_pps_sample_distribution)
@@ -23,9 +42,10 @@
 #' unique(bhai_pps_sample_distribution$infection)
 #'
 #' # Calculate prevalence
-#' library(dplyr)
+#' \dontrun{
 #' bhai_pps_sample_distribution |>
-#'   mutate(prevalence = num_hai_patients / num_survey_patients)
+#'   dplyr::mutate(prevalence = num_hai_patients / num_survey_patients)
+#' }
 "bhai_pps_sample_distribution"
 
 #' BHAI Stratified Summary Results
@@ -39,7 +59,7 @@
 #' \describe{
 #'   \item{country}{Country or region name}
 #'   \item{infection}{Type of healthcare-associated infection}
-#'   \item{sex}{Sex category (male/female)}
+#'   \item{sex}{Sex category (M/F)}
 #'   \item{age_group}{Age group category (factor)}
 #'   \item{ncases_lower_ci}{Lower 95% CI for number of cases}
 #'   \item{ncases_estimate}{Median estimate for number of cases}
@@ -52,7 +72,22 @@
 #'   \item{daly_upper_ci}{Upper 95% CI for DALYs}
 #' }
 #'
-#' @source Derived from BHAI simulations (nsim = 500) on German and EU PPS data
+#' @details
+#' Stratification enables identification of demographic groups at highest risk.
+#' Age groups span from 0-1 years to 85-120 years. Results derived from 500
+#' BHAI simulations incorporating uncertainty in prevalence, mortality, and
+#' disability weights.
+#'
+#' @source Derived from BHAI simulations (nsim = 500) on German and EU PPS data.
+#'   Zacher et al. (2019) \doi{10.2807/1560-7917.ES.2019.24.46.1900135}
+#'
+#' @references
+#' Zacher B, Haller S, Eckmanns T, Noll I, Weiss B, Widders G, Gastmeier P,
+#' Monnet DL. Application of a new methodology and R package reveals a high
+#' burden of healthcare-associated infections (HAI) in Germany compared to
+#' the average in the European Union/European Economic Area, 2011 to 2012.
+#' Euro Surveill. 2019;24(46):pii=1900135.
+#'
 #' @seealso [bhai_pps_sample_distribution], [bhai_pop_est]
 #'
 #' @examples
@@ -60,7 +95,6 @@
 #'
 #' # View age groups
 #' levels(bhai_strata_summary$age_group)
-#'
 "bhai_strata_summary"
 
 #' BHAI Population Estimates
@@ -72,7 +106,7 @@
 #'
 #' @format A tibble with population estimates by infection and country:
 #' \describe{
-#'   \item{infection}{Type of healthcare-associated infection}
+#'   \item{infection}{Type of healthcare-associated infection (or "ALL" for total)}
 #'   \item{cases_point_estimate}{Point estimate for number of cases}
 #'   \item{cases_lower_ci}{Lower 95% confidence interval for cases}
 #'   \item{cases_upper_ci}{Upper 95% confidence interval for cases}
@@ -89,7 +123,7 @@
 #'   \item{yld_lower_ci}{Lower 95% confidence interval for YLD}
 #'   \item{yld_upper_ci}{Upper 95% confidence interval for YLD}
 #'   \item{country}{Country or region (Germany or European Union)}
-#'   \item{population}{Total Population of the country or region}
+#'   \item{population}{Total population of the country or region}
 #' }
 #'
 #' @details
@@ -100,9 +134,19 @@
 #'   \item Parsing formatted strings to extract numeric estimates and confidence intervals
 #' }
 #'
-#' All estimates are population-level annual burden estimates.
+#' All estimates are population-level annual burden estimates. The "ALL" row
+#' represents the sum across all five HAI types.
 #'
-#' @source Derived from BHAI simulations on German PPS 2011 and EU PPS data
+#' @source Derived from BHAI simulations on German PPS 2011 and EU PPS data.
+#'   Zacher et al. (2019) \doi{10.2807/1560-7917.ES.2019.24.46.1900135}
+#'
+#' @references
+#' Zacher B, Haller S, Eckmanns T, Noll I, Weiss B, Widders G, Gastmeier P,
+#' Monnet DL. Application of a new methodology and R package reveals a high
+#' burden of healthcare-associated infections (HAI) in Germany compared to
+#' the average in the European Union/European Economic Area, 2011 to 2012.
+#' Euro Surveill. 2019;24(46):pii=1900135.
+#'
 #' @seealso [bhai_pps_sample_distribution], [bhai_strata_summary]
 #'
 #' @examples
@@ -111,9 +155,9 @@
 #' # View structure
 #' str(bhai_pop_est)
 #'
-#' # Infection with highest mortality
+#' # Total burden (ALL row)
+#' \dontrun{
 #' bhai_pop_est |>
-#'   filter(country == "Germany") |>
-#'   arrange(desc(deaths_point_estimate)) |>
-#'   select(infection, deaths_point_estimate, deaths_lower_ci, deaths_upper_ci)
+#'   dplyr::filter(infection == "ALL", country == "Germany")
+#' }
 "bhai_pop_est"

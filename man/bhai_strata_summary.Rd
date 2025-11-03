@@ -9,7 +9,7 @@ A data frame with stratified results:
 \describe{
 \item{country}{Country or region name}
 \item{infection}{Type of healthcare-associated infection}
-\item{sex}{Sex category (male/female)}
+\item{sex}{Sex category (M/F)}
 \item{age_group}{Age group category (factor)}
 \item{ncases_lower_ci}{Lower 95\% CI for number of cases}
 \item{ncases_estimate}{Median estimate for number of cases}
@@ -23,7 +23,8 @@ A data frame with stratified results:
 }
 }
 \source{
-Derived from BHAI simulations (nsim = 500) on German and EU PPS data
+Derived from BHAI simulations (nsim = 500) on German and EU PPS data.
+Zacher et al. (2019) \doi{10.2807/1560-7917.ES.2019.24.46.1900135}
 }
 \usage{
 bhai_strata_summary
@@ -33,12 +34,24 @@ Detailed stratified results from BHAI (Burden of Healthcare-Associated Infection
 analysis, including cases, deaths, and DALYs by country, infection type,
 sex, and age group, with 95\% confidence intervals.
 }
+\details{
+Stratification enables identification of demographic groups at highest risk.
+Age groups span from 0-1 years to 85-120 years. Results derived from 500
+BHAI simulations incorporating uncertainty in prevalence, mortality, and
+disability weights.
+}
 \examples{
 data(bhai_strata_summary)
 
 # View age groups
 levels(bhai_strata_summary$age_group)
-
+}
+\references{
+Zacher B, Haller S, Eckmanns T, Noll I, Weiss B, Widders G, Gastmeier P,
+Monnet DL. Application of a new methodology and R package reveals a high
+burden of healthcare-associated infections (HAI) in Germany compared to
+the average in the European Union/European Economic Area, 2011 to 2012.
+Euro Surveill. 2019;24(46):pii=1900135.
 }
 \seealso{
 \link{bhai_pps_sample_distribution}, \link{bhai_pop_est}

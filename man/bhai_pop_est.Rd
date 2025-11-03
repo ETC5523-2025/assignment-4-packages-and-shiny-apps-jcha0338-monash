@@ -7,7 +7,7 @@
 \format{
 A tibble with population estimates by infection and country:
 \describe{
-\item{infection}{Type of healthcare-associated infection}
+\item{infection}{Type of healthcare-associated infection (or "ALL" for total)}
 \item{cases_point_estimate}{Point estimate for number of cases}
 \item{cases_lower_ci}{Lower 95\% confidence interval for cases}
 \item{cases_upper_ci}{Upper 95\% confidence interval for cases}
@@ -24,11 +24,12 @@ A tibble with population estimates by infection and country:
 \item{yld_lower_ci}{Lower 95\% confidence interval for YLD}
 \item{yld_upper_ci}{Upper 95\% confidence interval for YLD}
 \item{country}{Country or region (Germany or European Union)}
-\item{population}{Total Population of the country or region}
+\item{population}{Total population of the country or region}
 }
 }
 \source{
-Derived from BHAI simulations on German PPS 2011 and EU PPS data
+Derived from BHAI simulations on German PPS 2011 and EU PPS data.
+Zacher et al. (2019) \doi{10.2807/1560-7917.ES.2019.24.46.1900135}
 }
 \usage{
 bhai_pop_est
@@ -46,7 +47,8 @@ This dataset is created by:
 \item Parsing formatted strings to extract numeric estimates and confidence intervals
 }
 
-All estimates are population-level annual burden estimates.
+All estimates are population-level annual burden estimates. The "ALL" row
+represents the sum across all five HAI types.
 }
 \examples{
 data(bhai_pop_est)
@@ -54,11 +56,18 @@ data(bhai_pop_est)
 # View structure
 str(bhai_pop_est)
 
-# Infection with highest mortality
+# Total burden (ALL row)
+\dontrun{
 bhai_pop_est |>
-  filter(country == "Germany") |>
-  arrange(desc(deaths_point_estimate)) |>
-  select(infection, deaths_point_estimate, deaths_lower_ci, deaths_upper_ci)
+  dplyr::filter(infection == "ALL", country == "Germany")
+}
+}
+\references{
+Zacher B, Haller S, Eckmanns T, Noll I, Weiss B, Widders G, Gastmeier P,
+Monnet DL. Application of a new methodology and R package reveals a high
+burden of healthcare-associated infections (HAI) in Germany compared to
+the average in the European Union/European Economic Area, 2011 to 2012.
+Euro Surveill. 2019;24(46):pii=1900135.
 }
 \seealso{
 \link{bhai_pps_sample_distribution}, \link{bhai_strata_summary}

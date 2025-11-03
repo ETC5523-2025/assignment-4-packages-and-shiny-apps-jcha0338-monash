@@ -14,7 +14,8 @@ A data frame with one row per infection type and country:
 }
 }
 \source{
-Derived from BHAI package using German PPS 2011 and EU PPS data
+Derived from BHAI package using German PPS 2011 and EU PPS data.
+Zacher et al. (2019) \doi{10.2807/1560-7917.ES.2019.24.46.1900135}
 }
 \usage{
 bhai_pps_sample_distribution
@@ -24,6 +25,16 @@ Sample distribution from Point Prevalence Surveys (PPS) showing the number
 of healthcare-associated infection (HAI) patients and total surveyed patients
 for Germany and the European Union.
 }
+\details{
+The five infection types tracked are:
+\itemize{
+\item \strong{HAP:} Hospital-acquired pneumonia
+\item \strong{SSI:} Surgical site infection
+\item \strong{BSI:} Bloodstream infection
+\item \strong{UTI:} Urinary tract infection
+\item \strong{CDI:} \emph{Clostridioides difficile} infection
+}
+}
 \examples{
 data(bhai_pps_sample_distribution)
 
@@ -31,11 +42,19 @@ data(bhai_pps_sample_distribution)
 unique(bhai_pps_sample_distribution$infection)
 
 # Calculate prevalence
-library(dplyr)
+\dontrun{
 bhai_pps_sample_distribution |>
-  mutate(prevalence = num_hai_patients / num_survey_patients)
+  dplyr::mutate(prevalence = num_hai_patients / num_survey_patients)
+}
+}
+\references{
+Zacher B, Haller S, Eckmanns T, Noll I, Weiss B, Widders G, Gastmeier P,
+Monnet DL. Application of a new methodology and R package reveals a high
+burden of healthcare-associated infections (HAI) in Germany compared to
+the average in the European Union/European Economic Area, 2011 to 2012.
+Euro Surveill. 2019;24(46):pii=1900135.
 }
 \seealso{
-\link{bhai_strata_summary}, \link{bhai_pop_est}
+\link{bhai_strata_summary}, \link{bhai_pop_est}, \code{\link[=flatten_pps]{flatten_pps()}}
 }
 \keyword{datasets}

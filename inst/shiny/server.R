@@ -5,6 +5,7 @@ library(tidyr)
 library(plotly)
 library(DT)
 library(scales)
+library(ggplot2)
 
 function(input, output, session) {
 
