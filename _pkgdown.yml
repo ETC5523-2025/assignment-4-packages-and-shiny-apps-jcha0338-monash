@@ -1,4 +1,4 @@
-url: https://jcha0338-monash.github.io/healthburdenr/
+url: https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-jcha0338-monash/
 
 template:
   bootstrap: 5
@@ -40,7 +40,7 @@ navbar:
 
     github:
       icon: fab fa-github
-      href: https://github.com/
+      href: https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-jcha0338-monash
       aria-label: GitHub
 
 reference:
