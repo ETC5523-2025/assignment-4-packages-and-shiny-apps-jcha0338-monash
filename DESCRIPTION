@@ -1,5 +1,5 @@
 Package: healthburdenr
-Title: Interactive Visualisation Comparing the Estimation Burden of Healthcare-Associated Infections in Germany and European Union.
+Title: Interactive Dashboard Comparing the Estimation of Burden of Healthcare-Associated Infections in Germany and European Union
 Version: 0.0.0.9000
 Authors@R: 
     person("Jay Ashok", "Chauhan", , "jcha0338@student.monash.edu", role = c("aut", "cre"))
