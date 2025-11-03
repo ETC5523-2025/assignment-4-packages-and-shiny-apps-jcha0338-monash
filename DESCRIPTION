@@ -1,18 +1,34 @@
 Package: healthburdenr
-Title: What the Package Does (One Line, Title Case)
+Title: Interactive Visualisation Comparing the Estimation Burden of Healthcare-Associated Infections in Germany and European Union.
 Version: 0.0.0.9000
 Authors@R: 
     person("Jay Ashok", "Chauhan", , "jcha0338@student.monash.edu", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: Provides tools and interactive visualizations for exploring 
+    healthcare-associated infection (HAI) burden estimates based on point 
+    prevalence survey data from European acute-care hospitals (2011-2012). 
+    Includes population estimates, stratified analyses, and disability-adjusted 
+    life years (DALYs) calculations. Based on Zacher et al.(2019) 
+    <doi:10.2807/1560-7917.ES.2019.24.46.1900135>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Imports: 
     BHAI,
+    dplyr,
     methods,
+    rlang,
     shiny,
-    tibble
+    tibble,
+    tidyr
 Depends: 
     R (>= 3.5)
 LazyData: true
+Suggests: 
+    DT,
+    ggplot2,
+    knitr,
+    plotly,
+    rmarkdown,
+    scales,
+    shinydashboard
